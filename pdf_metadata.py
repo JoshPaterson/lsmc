@@ -194,6 +194,7 @@ class PdfMetadata(BaseModel):
 
     def repair_xmp(self):
         params = ['exiftool', '-config', '.ExifTool_config', '-xmp:all=', '-tagsfromfile', '@', '-xmp:all', str(self.source_file)]
+        # https://exiftool.org/forum/index.php?topic=9094.0
 
 
 
