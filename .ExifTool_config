@@ -1,0 +1,163 @@
+#------------------------------------------------------------------------------
+# File:         example.config
+#
+# Description:  Example user configuration file for Image::ExifTool
+#
+# Notes:        This example file shows how to define your own shortcuts and
+#               add new EXIF, IPTC, XMP, PNG, MIE and Composite tags, as well
+#               as how to specify preferred lenses for the LensID tag, and
+#               define new file types and default ExifTool option values.
+#
+#               Note that unknown tags may be extracted even if they aren't
+#               defined, but tags must be defined to be written.  Also note
+#               that it is possible to override an existing tag definition
+#               with a user-defined tag.
+#
+#               To activate this file, rename it to ".ExifTool_config" and
+#               place it in your home directory or the exiftool application
+#               directory.  (On Mac and some Windows systems this must be done
+#               via the command line since the GUI's may not allow filenames to
+#               begin with a dot.  Use the "rename" command in Windows or "mv"
+#               on the Mac.)  This causes ExifTool to automatically load the
+#               file when run.  Your home directory is determined by the first
+#               defined of the following environment variables:
+#
+#                   1.  EXIFTOOL_HOME
+#                   2.  HOME
+#                   3.  HOMEDRIVE + HOMEPATH
+#                   4.  (the current directory)
+#
+#               Alternatively, the -config option of the exiftool application
+#               may be used to load a specific configuration file (note that
+#               this must be the first option on the command line):
+#
+#                   exiftool -config example.config ...
+#
+#               This example file defines the following 16 new tags as well as
+#               a number of Shortcut and Composite tags:
+#
+#                   1.  EXIF:NewEXIFTag
+#                   2.  GPS:GPSPitch
+#                   3.  GPS:GPSRoll
+#                   4.  IPTC:NewIPTCTag
+#                   5.  XMP-xmp:NewXMPxmpTag
+#                   6.  XMP-exif:GPSPitch
+#                   7.  XMP-exif:GPSRoll
+#                   8.  XMP-xxx:NewXMPxxxTag1
+#                   9.  XMP-xxx:NewXMPxxxTag2
+#                  10.  XMP-xxx:NewXMPxxxTag3
+#                  11.  XMP-xxx:NewXMPxxxStruct
+#                  12.  PNG:NewPngTag1
+#                  13.  PNG:NewPngTag2
+#                  14.  PNG:NewPngTag3
+#                  15.  MIE-Meta:NewMieTag1
+#                  16.  MIE-Test:NewMieTag2
+#
+#               For detailed information on the definition of tag tables and
+#               tag information hashes, see lib/Image/ExifTool/README.
+#------------------------------------------------------------------------------
+
+# The %Image::ExifTool::UserDefined hash defines new tags to be added
+# to existing tables.
+%Image::ExifTool::UserDefined = (
+    # new XMP namespaces (eg. xxx) must be added to the Main XMP table:
+    'Image::ExifTool::XMP::Main' => {
+        # namespace definition for examples 8 to 11
+        smc => { # <-- must be the same as the NAMESPACE prefix
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::UserDefined::smc',
+                # (see the definition of this table below)
+            },
+        },
+    },
+);
+
+
+# This is a basic example of the definition for a new XMP namespace.
+# This table is referenced through a SubDirectory tag definition
+# in the %Image::ExifTool::UserDefined definition above.
+# The namespace prefix for these tags is 'xxx', which corresponds to
+# an ExifTool family 1 group name of 'XMP-xxx'.
+%Image::ExifTool::UserDefined::smc = (
+    GROUPS => { 0 => 'XMP', 1 => 'XMP-smc', 2 => 'Document' },
+    NAMESPACE => { 'smc' => 'http://ns.scienceandmaterialculture.org/smc/1.0/' },
+    WRITABLE => 'string', # (default to string-type tags)
+
+    Url => { },
+
+    Authors => { List => 'Bag' },
+    Editors => { List => 'Bag' },
+    Translators => { List => 'Bag' },
+
+    DatePublished => { },
+    Frequency => { },
+
+    Title => { },
+    Subtitle => { },
+    LongTitle => { },
+    Edition => { Writable => 'integer'},
+    Volume => { Writable => 'integer'},
+
+    InCopyright => { Writable => 'boolean'},
+    Publishers => { List => 'Bag' },
+    PublisherCities => { List => 'Bag' },
+    Printers => { List => 'Bag' },
+    PrintingNumber => { },
+    CopyrightYears => { },
+
+    NumbersOffset => { },
+    RomanNumbersOffset => { },
+
+    HasLigatures => { },
+
+    BookTopics => { List => 'Bag' },
+
+    BlankPages => { List => 'Bag' },
+    TitlePages => { List => 'Bag' },
+    PublishingInfoPages => { List => 'Bag' },
+    BackCoverPages => { List => 'Bag' },
+    FrontCoverPages => { List => 'Bag' },
+    EndPaperPages => { List => 'Bag' },
+    PrintingInfoPages => { List => 'Bag' },
+    HalfTitlePages => { List => 'Bag' },
+    FrontispiecePages => { List => 'Bag' },
+    PlatePages => { List => 'Bag' },
+    IllustrationPages => { List => 'Bag' },
+    AdvertisementPages => { List => 'Bag' },
+
+    BookTopics => { List => 'Bag' },
+
+    PageGroups => {
+        List => 'Bag',
+        Struct => {
+            Kind => { },
+            Title => { },
+            Authors => { List => 'Bag' },
+            Number => { },
+            NumberKind => { },
+            ForEdition => { },
+            FirstPage => { },
+            LastPage => { },
+            ExceptPages => { List => 'Bag' },
+            Topics => { List => 'Bag' },
+        },
+    },
+
+    NullTags => { List => 'Bag' },
+    UnknownTags => { List => 'Bag' },
+
+    # PageTags => {
+    #     # the "Struct" entry defines the structure fields
+    #     Struct => {
+    #         # optional structure name (used for warning messages only)
+    #         STRUCT_NAME => 'PageTags',
+    #         # structure fields (very similar to tag definitions)
+    #         Tag => { Writable => 'string' },
+    #         Pages => { List => 'Bag' },
+    #         },
+    #     List => 'Bag', # structures may also be elements of a list
+    # },
+);
+
+#------------------------------------------------------------------------------
+1;  #end
