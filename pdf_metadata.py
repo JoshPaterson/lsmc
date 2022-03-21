@@ -23,6 +23,10 @@ ineditable_fields_alias = {to_camel(v) for v in ineditable_fields}
 
 number_kinds = {'roman_upper', 'roman_lower', 'arabic', 'letter_upper', 'letter_lower'}
 
+list_fields = {'authors', 'editors', 'translators', 'copyright_years', 'publishers', 'publisher_cities', 'printers', 'book_topics', 'page_groups', 'blank_pages', 'title_pages', 'publishing_info_pages', 'front_cover_pages', 'back_cover_pages', 'end_paper_pages', 'printing_info_pages', 'half_title_pages', 'frontispiece_pages', 'plate_pages', 'illustration_pages', 'advertisement_pages'}
+
+list_fields_alias = {to_camel(i) for i in list_fields}
+
 class Unchecked(object):
     def __bool__(self):
         return False
@@ -67,21 +71,21 @@ class PdfMetadata(BaseModel):
     editors: list[str] = UNCHECKED
     translators: list[str] = UNCHECKED
 
-    date_published: str = UNCHECKED
-    frequency: str = UNCHECKED
+    date_published: str | None = UNCHECKED
+    frequency: str | None = UNCHECKED
 
     title: str = UNCHECKED
-    subtitle: str = None
-    long_title: str = None
-    edition: PositiveInt = UNCHECKED
-    volume: PositiveInt = UNCHECKED
+    subtitle: str | None = UNCHECKED
+    long_title: str | None = UNCHECKED
+    edition: PositiveInt | None = UNCHECKED
+    volume: PositiveInt | None = UNCHECKED
 
     in_copyright: bool = UNCHECKED
     copyright_years: list[PositiveInt] = UNCHECKED
     publishers: list[str] = UNCHECKED
     publisher_cities: list[str] = UNCHECKED
     printers: list[str] = UNCHECKED
-    printing_number: PositiveInt = UNCHECKED
+    printing_number: PositiveInt | None = UNCHECKED
 
     numbers_offset: PositiveInt = UNCHECKED
     roman_numbers_offset: PositiveInt = UNCHECKED
@@ -90,7 +94,7 @@ class PdfMetadata(BaseModel):
 
     book_topics: list[str] = UNCHECKED
 
-    page_groups: list[PageGroup] = None
+    page_groups: list[PageGroup] = UNCHECKED
 
     blank_pages: list[PositiveInt] = UNCHECKED
     title_pages: list[PositiveInt] = UNCHECKED
@@ -106,6 +110,10 @@ class PdfMetadata(BaseModel):
     advertisement_pages: list[PositiveInt] = UNCHECKED
 
     page_count: int
+
+    # document_id: str
+    # instance_id: str
+    # metadata_version: str = '0.1'
 
     class Config:
         validate_assignment = True
@@ -123,9 +131,12 @@ class PdfMetadata(BaseModel):
     @classmethod
     def from_pdf(cls, pdf_path):
         in_dict = exiftool_read(pdf_path, ['-XMP-smc:all', '-PageCount'])
-        for tag in in_dict.get('null_tags', []):
-            in_dict[tag] = None
-        for tag in in_dict.get('unknown_tags', []):
+        for tag in in_dict.get('NullTags', []):
+            if tag in list_fields_alias:
+                in_dict[tag] = []
+            else:
+                in_dict[tag] = None
+        for tag in in_dict.get('UncheckedTags', []):
             in_dict[tag] = UNCHECKED
 
         return cls(**in_dict)
@@ -146,7 +157,7 @@ class PdfMetadata(BaseModel):
         unchecked_tags = []
 
         for field in self.editable_fields():
-            if (field in out_dict) & (out_dict[field] is None):
+            if (field in out_dict) & (out_dict[field] in [None, []]):
                 null_tags.append(field)
                 del out_dict[field]
             elif (field in out_dict) & (out_dict[field] is UNCHECKED):
