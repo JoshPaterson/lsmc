@@ -8,12 +8,16 @@ from enum import Enum, auto
 from pydantic import BaseModel, HttpUrl, FilePath, PastDate, PositiveInt, validator
 from typing import Optional, Any
 from pathlib import PosixPath
+import uuid
 
 
 class ExifToolError(RuntimeError):
     pass
 
-section_kinds = {'introduction', 'acknowledgement', 'dedication', 'preface', 'chapter', 'chapter_group', 'table', 'signature', 'appendix', 'glossary', 'index', 'table_of_contents', 'bibliography', 'publishers_catalog'}
+def uuid_str():
+    return str(uuid.uuid4)
+
+section_kinds = {'introduction', 'acknowledgement', 'dedication', 'preface', 'chapter', 'table', 'appendix', 'glossary', 'index', 'table_of_contents', 'bibliography', 'publishers_catalog', 'appendix', 'article', 'appendices', 'tables', 'chapter_group', 'plates'}
 
 def to_camel(string: str) -> str:
     return ''.join(word.capitalize() for word in string.split('_'))
@@ -23,9 +27,11 @@ ineditable_fields_alias = {to_camel(v) for v in ineditable_fields}
 
 number_kinds = {'roman_upper', 'roman_lower', 'arabic', 'letter_upper', 'letter_lower'}
 
-list_fields = {'authors', 'editors', 'translators', 'copyright_years', 'publishers', 'publisher_cities', 'printers', 'book_topics', 'page_groups', 'blank_pages', 'title_pages', 'publishing_info_pages', 'front_cover_pages', 'back_cover_pages', 'end_paper_pages', 'printing_info_pages', 'half_title_pages', 'frontispiece_pages', 'plate_pages', 'illustration_pages', 'advertisement_pages'}
+list_fields = {'authors', 'editors', 'translators', 'copyright_years', 'publishers', 'publisher_cities', 'printers', 'book_topics', 'page_groups', 'blank_pages', 'title_pages', 'publishing_info_pages', 'front_cover_pages', 'back_cover_pages', 'end_paper_pages', 'printing_info_pages', 'half_title_pages', 'frontispiece_pages', 'illustration_pages', 'advertisement_partial_pages', 'advertisement_full_pages', 'photograph_pages'}
 
 list_fields_alias = {to_camel(i) for i in list_fields}
+
+struct_fields = {'sections', 'signatures', 'plates'}
 
 class Unchecked(object):
     def __bool__(self):
@@ -42,59 +48,89 @@ class Unchecked(object):
 UNCHECKED = Unchecked()
 
 
-class PageGroup(BaseModel):
-    kind: str
-    title: str = None
-    number: str = None
-    number_kind: PositiveInt = None
-    for_edition: PositiveInt = None
+class Section(BaseModel):
+    kind: str = UNCHECKED
+    kind_in_book: str | None = UNCHECKED
+    title: str | None = UNCHECKED
+    authors: list[str] = UNCHECKED
+    number: PositiveInt | None = UNCHECKED
+    number_kind: str | None = UNCHECKED
+    for_edition: PositiveInt | None = UNCHECKED
+    heading_page: PositiveInt | None = UNCHECKED
     first_page: PositiveInt
     last_page: PositiveInt
-    except_pages: list[PositiveInt] = None
-    topics: list[str] = None
+    topics: list[str] = UNCHECKED
 
     class Config:
         alias_generator = to_camel
+        validate_assignment = True
 
     @validator('kind')
-    def valid_option(cls, v):
+    def valid_kind(cls, v):
         if v not in section_kinds:
-            raise ValueError('Invalid kind of PageGroup')
+            raise ValueError('Invalid value for Section.kind')
+        return v
+
+    @validator('number_kind')
+    def valid_number_kind(cls, v):
+        if v not in number_kinds:
+            raise ValueError('Invalid value for Section.number_kind')
         return v
 
 
-class PdfMetadata(BaseModel):
+class Plate(BaseModel):
+    number: int | None = UNCHECKED
+    number_kind: str | None = UNCHECKED
+    pages: list[PositiveInt]
+
+    class Config:
+        alias_generator = to_camel
+        validate_assignment = True
+
+    @validator('number_kind')
+    def valid_number_kind(cls, v):
+        if v not in number_kinds:
+            raise ValueError('Invalid value for Plate.number_kind')
+        return v
+
+class Signature(BaseModel):
+    name: str = UNCHECKED
+    page: PositiveInt
+
+    class Config:
+        alias_generator = to_camel
+        validate_assignment = True
+
+class Pdf(BaseModel):
     source_file: str
-    url: str = None
+    url: str | None = UNCHECKED
 
     authors: list[str] = UNCHECKED
     editors: list[str] = UNCHECKED
     translators: list[str] = UNCHECKED
 
     date_published: str | None = UNCHECKED
-    frequency: str | None = UNCHECKED
+    publishing_frequency: str | None = UNCHECKED
 
-    title: str = UNCHECKED
+    title: str | None = UNCHECKED
     subtitle: str | None = UNCHECKED
     long_title: str | None = UNCHECKED
     edition: PositiveInt | None = UNCHECKED
     volume: PositiveInt | None = UNCHECKED
 
-    in_copyright: bool = UNCHECKED
+    in_copyright: bool | None = UNCHECKED
     copyright_years: list[PositiveInt] = UNCHECKED
     publishers: list[str] = UNCHECKED
     publisher_cities: list[str] = UNCHECKED
     printers: list[str] = UNCHECKED
     printing_number: PositiveInt | None = UNCHECKED
 
-    numbers_offset: PositiveInt = UNCHECKED
-    roman_numbers_offset: PositiveInt = UNCHECKED
+    numbers_offset: PositiveInt | None = UNCHECKED
+    roman_numbers_offset: PositiveInt | None = UNCHECKED
 
     has_ligatures: bool = UNCHECKED
 
     book_topics: list[str] = UNCHECKED
-
-    page_groups: list[PageGroup] = UNCHECKED
 
     blank_pages: list[PositiveInt] = UNCHECKED
     title_pages: list[PositiveInt] = UNCHECKED
@@ -105,9 +141,14 @@ class PdfMetadata(BaseModel):
     printing_info_pages: list[PositiveInt] = UNCHECKED
     half_title_pages: list[PositiveInt] = UNCHECKED
     frontispiece_pages: list[PositiveInt] = UNCHECKED
-    plate_pages: list[PositiveInt] = UNCHECKED
     illustration_pages: list[PositiveInt] = UNCHECKED
-    advertisement_pages: list[PositiveInt] = UNCHECKED
+    advertisement_partial_pages: list[PositiveInt] = UNCHECKED
+    advertisement_full_pages: list[PositiveInt] = UNCHECKED
+    photograph_pages: list[PositiveInt] = UNCHECKED
+
+    signatures: list[Signature] = UNCHECKED
+    plates: list[Plate] = UNCHECKED
+    sections: list[Section] = UNCHECKED
 
     page_count: int
 
@@ -128,8 +169,10 @@ class PdfMetadata(BaseModel):
             v = str(v) + '-01-01'
         return v
 
+    # TODO: validate that all page numbers are less than PageCount
+
     @classmethod
-    def from_pdf(cls, pdf_path):
+    def from_path(cls, pdf_path):
         in_dict = exiftool_read(pdf_path, ['-XMP-smc:all', '-PageCount'])
         for tag in in_dict.get('NullTags', []):
             if tag in list_fields_alias:
@@ -195,7 +238,7 @@ class PdfMetadata(BaseModel):
         os.remove(temp_file)
         raise_error_if_necessary(returned)
 
-        new_metadata = PdfMetadata.from_pdf(self.source_file)
+        new_metadata = self.from_path(self.source_file)
         if new_metadata == self:
             os.remove(self.source_file + '_original')
         else:

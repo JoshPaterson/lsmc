@@ -90,59 +90,78 @@
     Translators => { List => 'Bag' },
 
     DatePublished => { },
-    Frequency => { },
+    PublishingFrequency => { },
 
     Title => { },
     Subtitle => { },
     LongTitle => { },
-    Edition => { Writable => 'integer'},
-    Volume => { Writable => 'integer'},
+    Edition => { Writable => 'integer' },
+    Volume => { Writable => 'integer' },
 
-    InCopyright => { Writable => 'boolean'},
+    InCopyright => { Writable => 'boolean' },
+    CopyrightYears => { List => 'Bag', Writeable => 'integer' },
     Publishers => { List => 'Bag' },
     PublisherCities => { List => 'Bag' },
     Printers => { List => 'Bag' },
-    PrintingNumber => { },
-    CopyrightYears => { },
+    PrintingNumber => { Writeable => 'integer' },
 
-    NumbersOffset => { },
-    RomanNumbersOffset => { },
+    NumbersOffset => { Writeable => 'integer' },
+    RomanNumbersOffset => { Writeable => 'integer' },
 
-    HasLigatures => { },
-
-    BookTopics => { List => 'Bag' },
-
-    BlankPages => { List => 'Bag' },
-    TitlePages => { List => 'Bag' },
-    PublishingInfoPages => { List => 'Bag' },
-    BackCoverPages => { List => 'Bag' },
-    FrontCoverPages => { List => 'Bag' },
-    EndPaperPages => { List => 'Bag' },
-    PrintingInfoPages => { List => 'Bag' },
-    HalfTitlePages => { List => 'Bag' },
-    FrontispiecePages => { List => 'Bag' },
-    PlatePages => { List => 'Bag' },
-    IllustrationPages => { List => 'Bag' },
-    AdvertisementPages => { List => 'Bag' },
+    HasLigatures => { Writeable => 'boolean' },
 
     BookTopics => { List => 'Bag' },
 
-    PageGroups => {
+    BlankPages => { List => 'Bag', Writeable => 'integer' },
+    TitlePages => { List => 'Bag', Writeable => 'integer' },
+    PublishingInfoPages => { List => 'Bag', Writeable => 'integer' },
+    BackCoverPages => { List => 'Bag', Writeable => 'integer' },
+    FrontCoverPages => { List => 'Bag', Writeable => 'integer' },
+    EndPaperPages => { List => 'Bag', Writeable => 'integer' },
+    PrintingInfoPages => { List => 'Bag', Writeable => 'integer' },
+    HalfTitlePages => { List => 'Bag', Writeable => 'integer' },
+    FrontispiecePages => { List => 'Bag', Writeable => 'integer' },
+    IllustrationPages => { List => 'Bag', Writeable => 'integer' },
+    AdvertisementFullPages => { List => 'Bag', Writeable => 'integer' },
+    AdvertisementPartialPages => { List => 'Bag', Writeable => 'integer' },
+    PhotographPages => { List => 'Bag', Writeable => 'integer' },
+
+    Signatures => {
+        List => 'Bag',
+        Struct => {
+            Name => {},
+            Page => { Writeable => 'integer' },
+        }
+    },
+
+    Plates => {
+        List => 'Bag',
+        Struct => {
+            Number => { Writeable => 'integer' },
+            NumberKind => { },
+            Pages => { List => 'Bag', Writeable => 'integer' },
+        }
+    },
+
+    Sections => {
         List => 'Bag',
         Struct => {
             Kind => { },
+            KindInBook => { },
             Title => { },
             Authors => { List => 'Bag' },
-            Number => { },
+            Number => { Writeable => 'integer' },
             NumberKind => { },
-            ForEdition => { },
-            FirstPage => { },
-            LastPage => { },
-            ExceptPages => { List => 'Bag' },
+            ForEdition => { Writeable => 'integer' },
+            HeadingPage => { Writeable => 'integer' },
+            FirstPage => { Writeable => 'integer' },
+            LastPage => { Writeable => 'integer' },
             Topics => { List => 'Bag' },
         },
     },
 
+    InstanceID => { },
+    DocumentID => { },
     NullTags => { List => 'Bag' },
     UnknownTags => { List => 'Bag' },
 
