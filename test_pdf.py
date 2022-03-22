@@ -5,8 +5,6 @@ from pathlib import Path
 import pytest
 from pydantic.error_wrappers import ValidationError
 
-from pdf import UNCHECKED
-
 class temp_copy:
     def __init__(self, file_path):
         self.file_path = Path(file_path)
