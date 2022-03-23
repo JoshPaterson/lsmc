@@ -1,12 +1,8 @@
-from pprint import pprint
-from sqlite3 import paramstyle
 from subprocess import run
 import json
 import os
-from tempfile import tempdir
-from enum import Enum, auto
-from pydantic import BaseModel, HttpUrl, FilePath, PastDate, PositiveInt, validator
-from typing import Optional, Any
+from pydantic import BaseModel, PositiveInt, validator, root_validator
+from pydantic.error_wrappers import ValidationError
 from pathlib import PosixPath
 import uuid
 
@@ -50,13 +46,13 @@ UNCHECKED = Unchecked()
 
 class Section(BaseModel):
     kind: str = UNCHECKED
-    kind_in_book: str | None = UNCHECKED
+    kind_in_book: str = UNCHECKED
     title: str | None = UNCHECKED
     authors: list[str] = UNCHECKED
     number: PositiveInt | None = UNCHECKED
     number_kind: str | None = UNCHECKED
     for_edition: PositiveInt | None = UNCHECKED
-    heading_page: PositiveInt | None = UNCHECKED
+    heading_page: PositiveInt = UNCHECKED
     first_page: PositiveInt
     last_page: PositiveInt
     topics: list[str] = UNCHECKED
@@ -68,14 +64,27 @@ class Section(BaseModel):
     @validator('kind')
     def valid_kind(cls, v):
         if v not in section_kinds:
-            raise ValueError('Invalid value for Section.kind')
+            raise ValidationError('Invalid value for Section.kind')
         return v
 
     @validator('number_kind')
     def valid_number_kind(cls, v):
-        if v not in number_kinds:
-            raise ValueError('Invalid value for Section.number_kind')
+        if v not in number_kinds.union({UNCHECKED, None}):
+            raise ValidationError('Invalid value for Section.number_kind')
         return v
+
+    @root_validator
+    def last_after_first(cls, values):
+        if values['last_page'] < values['first_page']:
+            raise ValidationError('last_page cannot be less than first_page')
+        return values
+
+    @root_validator
+    def heading_in_range(cls, values):
+        if values['heading_page'] is not UNCHECKED:
+            if not (values['first_page'] <= values['heading_page'] <= values['last_page']):
+                raise ValidationError('heading_page must be between first_page and last_page')
+        return values
 
 
 class Plate(BaseModel):
@@ -90,7 +99,7 @@ class Plate(BaseModel):
     @validator('number_kind')
     def valid_number_kind(cls, v):
         if v not in number_kinds:
-            raise ValueError('Invalid value for Plate.number_kind')
+            raise ValidationError('Invalid value for Plate.number_kind')
         return v
 
 class Signature(BaseModel):
