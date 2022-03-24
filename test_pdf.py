@@ -19,7 +19,7 @@ class temp_copy:
         self.temp_dir.cleanup()
 
 
-class TestPdfIndividualFields():
+class TestPdfFields():
     def test_url(self):
         with temp_copy('empty_no_metadata.pdf') as pdf_path:
             book = pdf.Pdf.from_path(pdf_path)
@@ -395,7 +395,7 @@ class TestPdfIndividualFields():
                 book.photograph_pages = 1
 
 
-class TestSignatureIndividualFields:
+class TestSignatureFields:
     def test_page(self):
         signature = pdf.Signature(**{'Page':16})
         signature.page = 24
@@ -410,7 +410,7 @@ class TestSignatureIndividualFields:
             signature.name = []
 
 
-class TestPlateIndividualFields:
+class TestPlateFields:
     def test_number(self):
         plate = pdf.Plate(**{'Pages':[1,2,3]})
         assert plate.number is pdf.UNCHECKED
@@ -432,36 +432,97 @@ class TestPlateIndividualFields:
             plate.pages = 3
 
 
-class TestSectionIndividualFields:
+class TestSectionFields:
     def test_kind(self):
-        pass
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
+        assert section.kind is pdf.UNCHECKED
+        section.kind = 'introduction'
+        with pytest.raises(ValidationError):
+            section.kind = None
+        with pytest.raises(ValidationError):
+            section.kind = 'test'
 
     def test_kind_in_book(self):
-        pass
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
+        assert section.kind_in_book is pdf.UNCHECKED
+        section.kind_in_book = 'chapter'
+        with pytest.raises(ValidationError):
+            section.kind_in_book = None
+        with pytest.raises(ValidationError):
+            section.kind_in_book = []
 
     def test_title(self):
-        pass
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
+        assert section.title is pdf.UNCHECKED
+        section.title = 'Basics of Trigonometry'
+        section.title = None
+        with pytest.raises(ValidationError):
+            section.title = []
 
     def test_authors(self):
-        pass
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
+        assert section.authors is pdf.UNCHECKED
+        section.authors = ['Maskelyne, Nevil']
+        with pytest.raises(ValidationError):
+            section.authors = 'test'
 
     def test_number(self):
-        pass
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
+        assert section.number is pdf.UNCHECKED
+        section.number = 4
+        section.number = None
+        with pytest.raises(ValidationError):
+            section.number = 'test'
 
     def test_number_kind(self):
-        pass
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
+        assert section.number_kind is pdf.UNCHECKED
+        section.number_kind = 'arabic'
+        section.number_kind = None
+        with pytest.raises(ValidationError):
+            section.number_kind = 'test'
 
     def test_for_edition(self):
-        pass
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
+        assert section.for_edition is pdf.UNCHECKED
+        section.for_edition = 2
+        section.for_edition = None
+        with pytest.raises(ValidationError):
+            section.for_edition = 'test'
 
     def test_heading_page(self):
-        pass
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 4})
+        assert section.heading_page is pdf.UNCHECKED
+        section.heading_page = 2
+        with pytest.raises(ValidationError):
+            section.heading_page = 5
+        with pytest.raises(ValidationError):
+            section.heading_page = None
+        with pytest.raises(ValidationError):
+            section.heading_page = 'test'
 
     def test_first_page(self):
-        pass
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 3})
+        section.first_page = 2
+        with pytest.raises(ValidationError):
+            section.first_page = 4
+        with pytest.raises(ValidationError):
+            section.first_page = 'test'
 
     def test_last_page(self):
-        pass
+        with pytest.raises(ValidationError):
+            section = pdf.Section(**{'FirstPage': 2, 'LastPage': 1})
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 3})
+        section.last_page = 2
+        with pytest.raises(ValidationError):
+            section.last_page = 'test'
 
     def test_topics(self):
-        pass
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
+        assert section.topics is pdf.UNCHECKED
+        section.topics = ['Navigation', 'Trigonometry']
+        section.topics = []
+        with pytest.raises(ValidationError):
+            section.topics = 'test'
+
+# make sure all validations are tested
