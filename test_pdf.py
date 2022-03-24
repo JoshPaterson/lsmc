@@ -21,206 +21,152 @@ class temp_copy:
 
 class TestPdfFields():
     def test_url(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.url is pdf.UNCHECKED
-            book.url = 'scienceandmaterialculture.com'
-            book.write()
-            book.url = None
-            book.write()
-            with pytest.raises(ValidationError):
-                book.url = []
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.url is pdf.UNCHECKED
+        book.url = 'scienceandmaterialculture.com'
+        book.url = None
+        with pytest.raises(ValidationError):
+            book.url = []
 
     def test_authors(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.authors is pdf.UNCHECKED
-            book.authors = ['Makelyne, Nevil', 'Bowditch, Nathaniel']
-            book.write()
-            book.authors = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.authors = 'Maskelyne, Nevil'
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.authors is pdf.UNCHECKED
+        book.authors = ['Makelyne, Nevil', 'Bowditch, Nathaniel']
+        book.authors = []
+        with pytest.raises(ValidationError):
+            book.authors = 'Maskelyne, Nevil'
 
     def test_editors(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.editors is pdf.UNCHECKED
-            book.editors= ['Makelyne, Nevil', 'Bowditch, Nathaniel']
-            book.write()
-            book.editors= []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.editors= 'Maskelyne, Nevil'
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.editors is pdf.UNCHECKED
+        book.editors= ['Makelyne, Nevil', 'Bowditch, Nathaniel']
+        book.editors= []
+        with pytest.raises(ValidationError):
+            book.editors= 'Maskelyne, Nevil'
 
     def test_translators(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.translators is pdf.UNCHECKED
-            book.translators = ['Makelyne, Nevil', 'Bowditch, Nathaniel']
-            book.write()
-            book.translators= []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.translators= 'Maskelyne, Nevil'
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.translators is pdf.UNCHECKED
+        book.translators = ['Makelyne, Nevil', 'Bowditch, Nathaniel']
+        book.translators= []
+        with pytest.raises(ValidationError):
+            book.translators= 'Maskelyne, Nevil'
 
     def test_date_published(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.date_published is pdf.UNCHECKED
-            book.date_published = '1763-01-01'
-            book.write()
-            book.date_published = 1763
-            book.write()
-            book.date_published = None
-            book.write()
-            with pytest.raises(ValidationError):
-                book.date_published = []
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.date_published is pdf.UNCHECKED
+        book.date_published = '1763-01-01'
+        book.date_published = 1763
+        book.date_published = None
+        with pytest.raises(ValidationError):
+            book.date_published = []
 
     def test_publishing_frequency(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.publishing_frequency is pdf.UNCHECKED
-            book.publishing_frequency = 'monthly'
-            book.write()
-            book.publishing_frequency = None
-            book.write()
-            with pytest.raises(ValidationError):
-                book.publishing_frequency = []
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.publishing_frequency is pdf.UNCHECKED
+        book.publishing_frequency = 'monthly'
+        book.publishing_frequency = None
+        with pytest.raises(ValidationError):
+            book.publishing_frequency = []
 
     def test_title(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.title is pdf.UNCHECKED
-            book.title = "British Mariner's Guide"
-            book.write()
-            book.title = None
-            book.write()
-            with pytest.raises(ValidationError):
-                book.title = []
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.title is pdf.UNCHECKED
+        book.title = "British Mariner's Guide"
+        book.title = None
+        with pytest.raises(ValidationError):
+            book.title = []
 
     def test_subtitle(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.subtitle is pdf.UNCHECKED
-            book.subtitle = "British Mariner's Guide"
-            book.write()
-            book.subtitle = None
-            book.write()
-            with pytest.raises(ValidationError):
-                book.subtitle = []
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.subtitle is pdf.UNCHECKED
+        book.subtitle = "British Mariner's Guide"
+        book.subtitle = None
+        with pytest.raises(ValidationError):
+            book.subtitle = []
 
     def test_long_title(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.long_title is pdf.UNCHECKED
-            book.long_title = "British Mariner's Guide"
-            book.write()
-            book.long_title = None
-            book.write()
-            with pytest.raises(ValidationError):
-                book.long_title = []
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.long_title is pdf.UNCHECKED
+        book.long_title = "British Mariner's Guide"
+        book.long_title = None
+        with pytest.raises(ValidationError):
+            book.long_title = []
 
     def test_edition(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.edition is pdf.UNCHECKED
-            book.edition = 1
-            book.write()
-            book.edition = None
-            book.write()
-            with pytest.raises(ValidationError):
-                book.edition = []
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.edition is pdf.UNCHECKED
+        book.edition = 1
+        book.edition = None
+        with pytest.raises(ValidationError):
+            book.edition = []
 
     def test_volume(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.volume is pdf.UNCHECKED
-            book.volume = 2
-            book.write()
-            book.volume = None
-            book.write()
-            with pytest.raises(ValidationError):
-                book.volume = []
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.volume is pdf.UNCHECKED
+        book.volume = 2
+        book.volume = None
+        with pytest.raises(ValidationError):
+            book.volume = []
 
     def test_in_copyright(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.in_copyright is pdf.UNCHECKED
-            book.in_copyright = True
-            book.write()
-            book.in_copyright = None
-            book.write()
-            with pytest.raises(ValidationError):
-                book.in_copyright = []
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.in_copyright is pdf.UNCHECKED
+        book.in_copyright = True
+        book.in_copyright = None
+        with pytest.raises(ValidationError):
+            book.in_copyright = []
 
     def test_copyright_years(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.copyright_years is pdf.UNCHECKED
-            book.copyright_years = [1752, 1758, 1762]
-            book.write()
-            book.copyright_years = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.copyright_years = 'test'
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.copyright_years is pdf.UNCHECKED
+        book.copyright_years = [1752, 1758, 1762]
+        book.copyright_years = []
+        with pytest.raises(ValidationError):
+            book.copyright_years = 'test'
 
     def test_publishers(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.publishers is pdf.UNCHECKED
-            book.publishers = ['test', 'test1']
-            book.write()
-            book.publishers = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.publishers = 'test'
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.publishers is pdf.UNCHECKED
+        book.publishers = ['test', 'test1']
+        book.publishers = []
+        with pytest.raises(ValidationError):
+            book.publishers = 'test'
 
     def test_publisher_cities(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.publisher_cities is pdf.UNCHECKED
-            book.publisher_cities = ['test', 'test2']
-            book.write()
-            book.publisher_cities = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.publisher_cities = 'test'
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.publisher_cities is pdf.UNCHECKED
+        book.publisher_cities = ['test', 'test2']
+        book.publisher_cities = []
+        with pytest.raises(ValidationError):
+            book.publisher_cities = 'test'
 
     def test_printers(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.printers is pdf.UNCHECKED
-            book.printers = ['test', 'test2']
-            book.write()
-            book.printers = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.printers = 'test'
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.printers is pdf.UNCHECKED
+        book.printers = ['test', 'test2']
+        book.printers = []
+        with pytest.raises(ValidationError):
+            book.printers = 'test'
 
     def test_printing_number(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.printing_number is pdf.UNCHECKED
-            book.printing_number = 2
-            book.write()
-            book.printing_number = None
-            book.write()
-            with pytest.raises(ValidationError):
-                book.printing_number = []
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.printing_number is pdf.UNCHECKED
+        book.printing_number = 2
+        book.printing_number = None
+        with pytest.raises(ValidationError):
+            book.printing_number = []
 
     def test_numbers_offset(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.numbers_offset is pdf.UNCHECKED
-            book.numbers_offset = 12
-            book.write()
-            book.numbers_offset = None
-            book.write()
-            with pytest.raises(ValidationError):
-                book.numbers_offset = []
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.numbers_offset is pdf.UNCHECKED
+        book.numbers_offset = 12
+        book.numbers_offset = None
+        with pytest.raises(ValidationError):
+            book.numbers_offset = []
 
     def test_roman_numbers_offset(self):
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
         with temp_copy('empty_no_metadata.pdf') as pdf_path:
             book = pdf.Pdf.from_path(pdf_path)
             assert book.roman_numbers_offset is pdf.UNCHECKED
@@ -232,167 +178,153 @@ class TestPdfFields():
                 book.roman_numbers_offset = []
 
     def test_has_ligatures(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.has_ligatures is pdf.UNCHECKED
-            book.has_ligatures = True
-            book.write()
-            with pytest.raises(ValidationError):
-                book.has_ligatures = []
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.has_ligatures is pdf.UNCHECKED
+        book.has_ligatures = True
+        with pytest.raises(ValidationError):
+            book.has_ligatures = []
 
     def test_book_topics(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.book_topics is pdf.UNCHECKED
-            book.book_topics = ['Navigation', 'Astronomy']
-            book.write()
-            book.book_topics = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.book_topics = 'test'
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.book_topics is pdf.UNCHECKED
+        book.book_topics = ['Navigation', 'Astronomy']
+        book.book_topics = []
+        with pytest.raises(ValidationError):
+            book.book_topics = 'test'
 
     def test_blank_pages(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.blank_pages is pdf.UNCHECKED
-            book.blank_pages = [1,2,3]
-            book.write()
-            book.blank_pages = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.blank_pages = 1
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.blank_pages is pdf.UNCHECKED
+        book.blank_pages = [1,2,3]
+        book.blank_pages = []
+        with pytest.raises(ValidationError):
+            book.blank_pages = 1
 
     def test_title_pages(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.title_pages is pdf.UNCHECKED
-            book.title_pages = [1,2,3]
-            book.write()
-            book.title_pages = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.title_pages = 1
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.title_pages is pdf.UNCHECKED
+        book.title_pages = [1,2,3]
+        book.title_pages = []
+        with pytest.raises(ValidationError):
+            book.title_pages = 1
 
     def test_publishing_info_pages(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.publishing_info_pages is pdf.UNCHECKED
-            book.publishing_info_pages = [1,2,3]
-            book.write()
-            book.publishing_info_pages = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.publishing_info_pages = 1
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.publishing_info_pages is pdf.UNCHECKED
+        book.publishing_info_pages = [1,2,3]
+        book.publishing_info_pages = []
+        with pytest.raises(ValidationError):
+            book.publishing_info_pages = 1
 
     def test_front_cover_pages(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.front_cover_pages is pdf.UNCHECKED
-            book.front_cover_pages = [1,2,3]
-            book.write()
-            book.front_cover_pages = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.front_cover_pages = 1
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.front_cover_pages is pdf.UNCHECKED
+        book.front_cover_pages = [1,2,3]
+        book.front_cover_pages = []
+        with pytest.raises(ValidationError):
+            book.front_cover_pages = 1
 
     def test_back_cover_pages(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.back_cover_pages is pdf.UNCHECKED
-            book.back_cover_pages = [1,2,3]
-            book.write()
-            book.back_cover_pages = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.back_cover_pages = 1
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.back_cover_pages is pdf.UNCHECKED
+        book.back_cover_pages = [1,2,3]
+        book.back_cover_pages = []
+        with pytest.raises(ValidationError):
+            book.back_cover_pages = 1
 
     def test_end_paper_pages(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.end_paper_pages is pdf.UNCHECKED
-            book.end_paper_pages = [1,2,3]
-            book.write()
-            book.end_paper_pages = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.end_paper_pages = 1
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.end_paper_pages is pdf.UNCHECKED
+        book.end_paper_pages = [1,2,3]
+        book.end_paper_pages = []
+        with pytest.raises(ValidationError):
+            book.end_paper_pages = 1
 
     def test_printing_info_pages(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.printing_info_pages is pdf.UNCHECKED
-            book.printing_info_pages = [1,2,3]
-            book.write()
-            book.printing_info_pages = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.printing_info_pages = 1
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.printing_info_pages is pdf.UNCHECKED
+        book.printing_info_pages = [1,2,3]
+        book.printing_info_pages = []
+        with pytest.raises(ValidationError):
+            book.printing_info_pages = 1
 
     def test_half_title_pages(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.half_title_pages is pdf.UNCHECKED
-            book.half_title_pages = [1,2,3]
-            book.write()
-            book.half_title_pages = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.half_title_pages = 1
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.half_title_pages is pdf.UNCHECKED
+        book.half_title_pages = [1,2,3]
+        book.half_title_pages = []
+        with pytest.raises(ValidationError):
+            book.half_title_pages = 1
 
     def test_frontispiece_pages(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.frontispiece_pages is pdf.UNCHECKED
-            book.frontispiece_pages = [1,2,3]
-            book.write()
-            book.frontispiece_pages = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.frontispiece_pages = 1
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.frontispiece_pages is pdf.UNCHECKED
+        book.frontispiece_pages = [1,2,3]
+        book.frontispiece_pages = []
+        with pytest.raises(ValidationError):
+            book.frontispiece_pages = 1
 
     def test_illustration_pages(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.illustration_pages is pdf.UNCHECKED
-            book.illustration_pages = [1,2,3]
-            book.write()
-            book.illustration_pages = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.illustration_pages = 1
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.illustration_pages is pdf.UNCHECKED
+        book.illustration_pages = [1,2,3]
+        book.illustration_pages = []
+        with pytest.raises(ValidationError):
+            book.illustration_pages = 1
 
     def test_advertisement_partial_pages(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.advertisement_partial_pages is pdf.UNCHECKED
-            book.advertisement_partial_pages = [1,2,3]
-            book.write()
-            book.advertisement_partial_pages = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.advertisement_partial_pages = 1
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.advertisement_partial_pages is pdf.UNCHECKED
+        book.advertisement_partial_pages = [1,2,3]
+        book.advertisement_partial_pages = []
+        with pytest.raises(ValidationError):
+            book.advertisement_partial_pages = 1
 
     def test_advertisement_full_pages(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.advertisement_full_pages is pdf.UNCHECKED
-            book.advertisement_full_pages = [1,2,3]
-            book.write()
-            book.advertisement_full_pages = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.advertisement_full_pages = 1
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.advertisement_full_pages is pdf.UNCHECKED
+        book.advertisement_full_pages = [1,2,3]
+        book.advertisement_full_pages = []
+        with pytest.raises(ValidationError):
+            book.advertisement_full_pages = 1
 
     def test_photograph_pages(self):
-        with temp_copy('empty_no_metadata.pdf') as pdf_path:
-            book = pdf.Pdf.from_path(pdf_path)
-            assert book.photograph_pages is pdf.UNCHECKED
-            book.photograph_pages = [1,2,3]
-            book.write()
-            book.photograph_pages = []
-            book.write()
-            with pytest.raises(ValidationError):
-                book.photograph_pages = 1
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
+        assert book.photograph_pages is pdf.UNCHECKED
+        book.photograph_pages = [1,2,3]
+        book.photograph_pages = []
+        with pytest.raises(ValidationError):
+            book.photograph_pages = 1
+
+    def test_sections(self):
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 34,
+                          'Sections': [
+                              {'FirstPage': 1, 'LastPage': 5},
+                              {'FirstPage': 6, 'LastPage': 10}]
+                        })
+        book.sections = []
+        with pytest.raises(ValidationError):
+            book.sections = 'test'
+
+    def test_plates(self):
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 34,
+                          'Plates': [
+                              {'Pages': [5, 6]},
+                              {'Pages': [7, 8]}]
+                        })
+        book.plates= []
+        with pytest.raises(ValidationError):
+            book.plates = 'test'
+
+    def test_signatures(self):
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 34,
+                          'Signatures': [
+                              {'Page': 16},
+                              {'Page': 32}]
+                        })
+        book.signatures = []
+        with pytest.raises(ValidationError):
+            book.signatures = 'test'
 
 
 class TestSignatureFields:
@@ -525,4 +457,15 @@ class TestSectionFields:
         with pytest.raises(ValidationError):
             section.topics = 'test'
 
-# make sure all validations are tested
+
+class TestReadWrite:
+    def test_all_unchecked(self):
+        with temp_copy('empty_no_metadata.pdf') as pdf_path:
+            book = pdf.Pdf.from_path(pdf_path)
+
+
+    def test_all_null(self):
+        pass
+
+    def test_all_values(self):
+        pass
