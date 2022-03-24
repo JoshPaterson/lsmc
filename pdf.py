@@ -161,9 +161,6 @@ class Pdf(BaseModel):
 
     page_count: int
 
-    # document_id: str
-    # instance_id: str
-    # metadata_version: str = '0.1'
 
     class Config:
         validate_assignment = True
@@ -178,7 +175,6 @@ class Pdf(BaseModel):
             v = str(v) + '-01-01'
         return v
 
-    # TODO: validate that all page numbers are less than PageCount
 
     @classmethod
     def from_path(cls, pdf_path):
@@ -222,10 +218,6 @@ class Pdf(BaseModel):
         if unchecked_tags:
             out_dict['UncheckedTags'] = unchecked_tags
 
-        # if 'date_published' in out_dict:
-        #     out_dict['date_published'] = out_dict['date_published'].isoformat()
-
-
         out_dict = {f'XMP-smc:{k}':v for k,v in out_dict.items()}
         out_dict.update({'SourceFile': self.source_file})
         return out_dict
@@ -245,6 +237,8 @@ class Pdf(BaseModel):
         params = ['exiftool', '-config', '.ExifTool_config', f'-json={temp_file}'] + params + [str(self.source_file)]
         returned = run(params, capture_output=True)
         os.remove(temp_file)
+        if b'0 image files updated in returned.stderr':
+            raise ExifToolError(f'Exiftool exited with a return code of {returned.returncode}: {returned.stderr.decode()}')
         raise_error_if_necessary(returned)
 
         new_metadata = self.from_path(self.source_file)
