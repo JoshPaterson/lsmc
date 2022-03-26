@@ -52,7 +52,7 @@ class Section(BaseModel):
     number: PositiveInt | None | Unchecked = UNCHECKED
     number_kind: str | None | Unchecked = UNCHECKED
     for_edition: PositiveInt | None | Unchecked = UNCHECKED
-    heading_page: PositiveInt | Unchecked = UNCHECKED
+    heading_page: PositiveInt
     first_page: PositiveInt
     last_page: PositiveInt
     topics: list[str] | Unchecked = UNCHECKED

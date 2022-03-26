@@ -576,8 +576,8 @@ class TestPdfFields():
 
     def test_sections(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 34})
-        book.sections = [pdf.Section(**{'FirstPage': 1, 'LastPage': 5}),
-                         pdf.Section(**{'FirstPage': 6, 'LastPage': 10})]
+        book.sections = [pdf.Section(**{'FirstPage': 1, 'LastPage': 5, 'HeadingPage': 1}),
+                         pdf.Section(**{'FirstPage': 6, 'LastPage': 10, 'HeadingPage': 6})]
         assert book.sections[0].first_page == 1
         assert book.sections[0].last_page == 5
         assert book.sections[1].first_page == 6
@@ -711,7 +711,7 @@ class TestPlateFields:
 
 class TestSectionFields:
     def test_kind(self):
-        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1, 'HeadingPage': 1})
         assert section.kind == pdf.UNCHECKED
         v = 'introduction'
         section.kind = v
@@ -728,7 +728,7 @@ class TestSectionFields:
             section.kind = ''
 
     def test_kind_in_book(self):
-        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1, 'HeadingPage': 1})
         assert section.kind_in_book == pdf.UNCHECKED
         v = 'chapter'
         section.kind_in_book = v
@@ -743,7 +743,7 @@ class TestSectionFields:
             section.kind_in_book = ''
 
     def test_title(self):
-        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1, 'HeadingPage': 1})
         assert section.title == pdf.UNCHECKED
         v = 'Basics of Trigonometry'
         section.title = v
@@ -758,7 +758,7 @@ class TestSectionFields:
             section.title = ''
 
     def test_authors(self):
-        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1, 'HeadingPage': 1})
         assert section.authors == pdf.UNCHECKED
         v = ['Maskelyne, Nevil']
         section.authors = v
@@ -775,7 +775,7 @@ class TestSectionFields:
             section.authors = ['']
 
     def test_number(self):
-        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1, 'HeadingPage': 1})
         assert section.number == pdf.UNCHECKED
         v = 4
         section.number = v
@@ -790,7 +790,7 @@ class TestSectionFields:
             section.number = ''
 
     def test_number_kind(self):
-        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1, 'HeadingPage': 1})
         assert section.number_kind == pdf.UNCHECKED
         v = 'arabic'
         section.number_kind = v
@@ -805,7 +805,7 @@ class TestSectionFields:
             section.number_kind = []
 
     def test_for_edition(self):
-        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1, 'HeadingPage': 1})
         assert section.for_edition == pdf.UNCHECKED
         v = 2
         section.for_edition = v
@@ -820,13 +820,14 @@ class TestSectionFields:
             section.for_edition = []
 
     def test_heading_page(self):
-        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 4})
-        assert section.heading_page == pdf.UNCHECKED
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 4, 'HeadingPage': 1})
         v = 2
         section.heading_page = v
         assert section.heading_page == v
-        section.heading_page = pdf.UNCHECKED
-        assert section.heading_page == pdf.UNCHECKED
+        with pytest.raises(ValidationError):
+            section.heading_page = 6
+        with pytest.raises(ValidationError):
+            section.heading_page = pdf.UNCHECKED
         with pytest.raises(ValidationError):
             section.heading_page = 5
         with pytest.raises(ValidationError):
@@ -837,8 +838,9 @@ class TestSectionFields:
             section.heading_page = []
 
     def test_first_page(self):
-        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 3})
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 3, 'HeadingPage': 1})
         v = 2
+        section.heading_page = v
         section.first_page = v
         assert section.first_page == v
         with pytest.raises(ValidationError):
@@ -854,8 +856,8 @@ class TestSectionFields:
 
     def test_last_page(self):
         with pytest.raises(ValidationError):
-            section = pdf.Section(**{'FirstPage': 2, 'LastPage': 1})
-        section = pdf.Section(**{'FirstPage': 2, 'LastPage': 4})
+            section = pdf.Section(**{'FirstPage': 2, 'LastPage': 1, 'HeadingPage': 1})
+        section = pdf.Section(**{'FirstPage': 2, 'LastPage': 4, 'HeadingPage': 2})
         assert section.last_page == 4
         v = 2
         section.last_page = v
@@ -872,7 +874,7 @@ class TestSectionFields:
             section.last_page = []
 
     def test_topics(self):
-        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
+        section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1, 'HeadingPage': 1})
         assert section.topics == pdf.UNCHECKED
         v = ['Navigation', 'Trigonometry']
         section.topics = v
@@ -899,7 +901,7 @@ class TestReadWrite:
     def test_all_unchecked_structs(self):
         with temp_copy('empty_no_metadata.pdf') as pdf_path:
             book = pdf.Pdf.from_path(pdf_path)
-            book.sections = [pdf.Section(**{'FirstPage': 1, 'LastPage': 2})]
+            book.sections = [pdf.Section(**{'FirstPage': 1, 'LastPage': 2, 'HeadingPage': 1})]
             book.plates = pdf.Plate(**{'Page': 3})
             book.signatures = pdf.Signature(**{'Page': 4})
 
