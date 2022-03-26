@@ -77,7 +77,7 @@ class Section(BaseModel):
             raise ValidationError('Invalid value for Section.number_kind')
         return v
 
-    @validator('kind_in_book', 'title', pre=True)
+    @validator('heading_page', 'for_edition', 'number', 'number_kind', 'kind', 'kind_in_book', 'title', pre=True)
     def not_empty_sequence(cls, v):
         if isinstance(v, list | tuple | set):
             raise ValidationError('Cannot be an empty sequence')
