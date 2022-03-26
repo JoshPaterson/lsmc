@@ -31,6 +31,8 @@ class TestPdfFields():
         book.url = pdf.UNCHECKED
         assert book.url == pdf.UNCHECKED
         with pytest.raises(ValidationError):
+            book.url = ''
+        with pytest.raises(ValidationError):
             book.url = []
 
     def test_authors(self):
@@ -47,6 +49,8 @@ class TestPdfFields():
             book.authors = None
         with pytest.raises(ValidationError):
             book.authors = 'Maskelyne, Nevil'
+        with pytest.raises(ValidationError):
+            book.authors = ['']
 
     def test_editors(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -62,6 +66,8 @@ class TestPdfFields():
             book.editors = None
         with pytest.raises(ValidationError):
             book.editors = 'Maskelyne, Nevil'
+        with pytest.raises(ValidationError):
+            book.editors = ['']
 
     def test_translators(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -77,6 +83,8 @@ class TestPdfFields():
             book.translators= None
         with pytest.raises(ValidationError):
             book.translators = 'Maskelyne, Nevil'
+        with pytest.raises(ValidationError):
+            book.translators = ['']
 
     def test_date_published(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -92,6 +100,8 @@ class TestPdfFields():
         assert book.date_published == pdf.UNCHECKED
         with pytest.raises(ValidationError):
             book.date_published = []
+        with pytest.raises(ValidationError):
+            book.date_published = ''
 
     def test_publishing_frequency(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -105,6 +115,8 @@ class TestPdfFields():
         assert book.publishing_frequency == pdf.UNCHECKED
         with pytest.raises(ValidationError):
             book.publishing_frequency = []
+        with pytest.raises(ValidationError):
+            book.publishing_frequency = ''
 
     def test_title(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -118,6 +130,8 @@ class TestPdfFields():
         assert book.title == pdf.UNCHECKED
         with pytest.raises(ValidationError):
             book.title = []
+        with pytest.raises(ValidationError):
+            book.title = ''
 
     def test_subtitle(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -131,6 +145,8 @@ class TestPdfFields():
         assert book.subtitle == pdf.UNCHECKED
         with pytest.raises(ValidationError):
             book.subtitle = []
+        with pytest.raises(ValidationError):
+            book.subtitle = ''
 
     def test_long_title(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -144,6 +160,8 @@ class TestPdfFields():
         assert book.long_title == pdf.UNCHECKED
         with pytest.raises(ValidationError):
             book.long_title = []
+        with pytest.raises(ValidationError):
+            book.long_title = ''
 
     def test_edition(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -157,6 +175,8 @@ class TestPdfFields():
         assert book.edition == pdf.UNCHECKED
         with pytest.raises(ValidationError):
             book.edition = []
+        with pytest.raises(ValidationError):
+            book.edition = ''
 
     def test_volume(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -170,6 +190,8 @@ class TestPdfFields():
         assert book.volume == pdf.UNCHECKED
         with pytest.raises(ValidationError):
             book.volume = []
+        with pytest.raises(ValidationError):
+            book.volume = ''
 
     def test_in_copyright(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -183,6 +205,8 @@ class TestPdfFields():
         assert book.in_copyright == pdf.UNCHECKED
         with pytest.raises(ValidationError):
             book.in_copyright = []
+        with pytest.raises(ValidationError):
+            book.in_copyright = ''
 
     def test_copyright_years(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -198,6 +222,8 @@ class TestPdfFields():
             book.copyright_years = 'test'
         with pytest.raises(ValidationError):
             book.copyright_years = None
+        with pytest.raises(ValidationError):
+            book.copyright_years = ['']
 
     def test_publishers(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -213,6 +239,8 @@ class TestPdfFields():
             book.copyright_years = None
         with pytest.raises(ValidationError):
             book.publishers = 'test'
+        with pytest.raises(ValidationError):
+            book.publishers = ['']
 
     def test_publisher_cities(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -228,6 +256,8 @@ class TestPdfFields():
             book.publisher_cities = None
         with pytest.raises(ValidationError):
             book.publisher_cities = 'test'
+        with pytest.raises(ValidationError):
+            book.publisher_cities = ['']
 
     def test_printers(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -243,6 +273,8 @@ class TestPdfFields():
             book.printers = None
         with pytest.raises(ValidationError):
             book.printers = 'test'
+        with pytest.raises(ValidationError):
+            book.printers = ['']
 
     def test_printing_number(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -256,6 +288,8 @@ class TestPdfFields():
         assert book.printing_number == pdf.UNCHECKED
         with pytest.raises(ValidationError):
             book.printing_number = []
+        with pytest.raises(ValidationError):
+            book.printing_number = ''
 
     def test_numbers_offset(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -269,6 +303,8 @@ class TestPdfFields():
         assert book.numbers_offset == pdf.UNCHECKED
         with pytest.raises(ValidationError):
             book.numbers_offset = []
+        with pytest.raises(ValidationError):
+            book.numbers_offset = ''
 
     def test_roman_numbers_offset(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -282,6 +318,8 @@ class TestPdfFields():
         assert book.roman_numbers_offset == pdf.UNCHECKED
         with pytest.raises(ValidationError):
             book.roman_numbers_offset = []
+        with pytest.raises(ValidationError):
+            book.roman_numbers_offset = ''
 
     def test_has_ligatures(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -294,6 +332,8 @@ class TestPdfFields():
             book.has_ligatures = []
         with pytest.raises(ValidationError):
             book.has_ligatures = None
+        with pytest.raises(ValidationError):
+            book.has_ligatures = ''
 
     def test_book_topics(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -309,6 +349,8 @@ class TestPdfFields():
             book.book_topics = None
         with pytest.raises(ValidationError):
             book.book_topics = 'test'
+        with pytest.raises(ValidationError):
+            book.book_topics = ['']
 
     def test_blank_pages(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -324,6 +366,8 @@ class TestPdfFields():
             book.blank_pages = None
         with pytest.raises(ValidationError):
             book.blank_pages = 1
+        with pytest.raises(ValidationError):
+            book.blank_pages = ['']
 
     def test_title_pages(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -339,6 +383,8 @@ class TestPdfFields():
             book.title_pages = None
         with pytest.raises(ValidationError):
             book.title_pages = 1
+        with pytest.raises(ValidationError):
+            book.title_pages = ['']
 
     def test_publishing_info_pages(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -354,6 +400,8 @@ class TestPdfFields():
             book.publishing_info_pages = None
         with pytest.raises(ValidationError):
             book.publishing_info_pages = 1
+        with pytest.raises(ValidationError):
+            book.publishing_info_pages = ['']
 
     def test_front_cover_pages(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -369,6 +417,8 @@ class TestPdfFields():
             book.front_cover_pages = None
         with pytest.raises(ValidationError):
             book.front_cover_pages = 1
+        with pytest.raises(ValidationError):
+            book.front_cover_pages = ['']
 
     def test_back_cover_pages(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -384,6 +434,8 @@ class TestPdfFields():
             book.back_cover_pages = None
         with pytest.raises(ValidationError):
             book.back_cover_pages = 1
+        with pytest.raises(ValidationError):
+            book.back_cover_pages = ['']
 
     def test_end_paper_pages(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -399,6 +451,9 @@ class TestPdfFields():
             book.end_paper_pages = None
         with pytest.raises(ValidationError):
             book.end_paper_pages = 1
+        with pytest.raises(ValidationError):
+            book.end_paper_pages = ['']
+
 
     def test_printing_info_pages(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -414,6 +469,8 @@ class TestPdfFields():
             book.printing_info_pages = None
         with pytest.raises(ValidationError):
             book.printing_info_pages = 1
+        with pytest.raises(ValidationError):
+            book.printing_info_pages = ['']
 
     def test_half_title_pages(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -429,6 +486,8 @@ class TestPdfFields():
             book.half_title_pages = None
         with pytest.raises(ValidationError):
             book.half_title_pages = 1
+        with pytest.raises(ValidationError):
+            book.half_title_pages = ['']
 
     def test_frontispiece_pages(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -444,6 +503,8 @@ class TestPdfFields():
             book.frontispiece_pages = None
         with pytest.raises(ValidationError):
             book.frontispiece_pages = 1
+        with pytest.raises(ValidationError):
+            book.frontispiece_pages = ['']
 
     def test_illustration_pages(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -459,6 +520,8 @@ class TestPdfFields():
             book.illustration_pages = None
         with pytest.raises(ValidationError):
             book.illustration_pages = 1
+        with pytest.raises(ValidationError):
+            book.illustration_pages = ['']
 
     def test_advertisement_partial_pages(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -474,6 +537,8 @@ class TestPdfFields():
             book.advertisement_partial_pages= None
         with pytest.raises(ValidationError):
             book.advertisement_partial_pages = 1
+        with pytest.raises(ValidationError):
+            book.advertisement_partial_pages = ['']
 
     def test_advertisement_full_pages(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -489,6 +554,8 @@ class TestPdfFields():
             book.advertisement_full_pages= None
         with pytest.raises(ValidationError):
             book.advertisement_full_pages = 1
+        with pytest.raises(ValidationError):
+            book.advertisement_full_pages = ['']
 
     def test_photograph_pages(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
@@ -504,6 +571,8 @@ class TestPdfFields():
             book.photograph_pages = None
         with pytest.raises(ValidationError):
             book.photograph_pages = 1
+        with pytest.raises(ValidationError):
+            book.photograph_pages = ['']
 
     def test_sections(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 34})
@@ -521,6 +590,8 @@ class TestPdfFields():
             book.sections = None
         with pytest.raises(ValidationError):
             book.sections = 'test'
+        with pytest.raises(KeyError):
+            book.sections = ['']
 
     def test_plates(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 34})
@@ -536,6 +607,8 @@ class TestPdfFields():
             book.plates = None
         with pytest.raises(ValidationError):
             book.plates = 'test'
+        with pytest.raises(ValidationError):
+            book.plates = ['']
 
     def test_signatures(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 34})
@@ -551,6 +624,8 @@ class TestPdfFields():
             book.signatures = None
         with pytest.raises(ValidationError):
             book.signatures = 'test'
+        with pytest.raises(ValidationError):
+            book.signatures = ['']
 
 
 class TestSignatureFields:
@@ -565,6 +640,8 @@ class TestSignatureFields:
             signature.page = pdf.UNCHECKED
         with pytest.raises(ValidationError):
             signature.page = []
+        with pytest.raises(ValidationError):
+            signature.page = ''
 
     def test_name(self):
         signature = pdf.Signature(**{'Page':16})
@@ -578,6 +655,8 @@ class TestSignatureFields:
             signature.name = None
         with pytest.raises(ValidationError):
             signature.name = []
+        with pytest.raises(ValidationError):
+            signature.name = ''
 
 
 class TestPlateFields:
@@ -593,6 +672,8 @@ class TestPlateFields:
         assert plate.number == pdf.UNCHECKED
         with pytest.raises(ValidationError):
             plate.number = []
+        with pytest.raises(ValidationError):
+            plate.number = ''
 
     def test_number_kind(self):
         plate = pdf.Plate(**{'Pages':[1,2,3]})
@@ -608,6 +689,8 @@ class TestPlateFields:
             plate.number_kind = 'test'
         with pytest.raises(ValidationError):
             plate.number_kind = []
+        with pytest.raises(ValidationError):
+            plate.number_kind = ''
 
     def test_pages(self):
         plate = pdf.Plate(**{'Pages':[1,2,3]})
@@ -622,6 +705,8 @@ class TestPlateFields:
             plate.pages = pdf.UNCHECKED
         with pytest.raises(ValidationError):
             plate.pages = 3
+        with pytest.raises(ValidationError):
+            plate.pages = ['']
 
 
 class TestSectionFields:
@@ -639,6 +724,8 @@ class TestSectionFields:
             section.kind = 'test'
         with pytest.raises(ValidationError):
             section.kind = []
+        with pytest.raises(ValidationError):
+            section.kind = ''
 
     def test_kind_in_book(self):
         section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
@@ -652,6 +739,8 @@ class TestSectionFields:
             section.kind_in_book = None
         with pytest.raises(ValidationError):
             section.kind_in_book = []
+        with pytest.raises(ValidationError):
+            section.kind_in_book = ''
 
     def test_title(self):
         section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
@@ -665,6 +754,8 @@ class TestSectionFields:
         assert section.title == pdf.UNCHECKED
         with pytest.raises(ValidationError):
             section.title = []
+        with pytest.raises(ValidationError):
+            section.title = ''
 
     def test_authors(self):
         section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
@@ -680,6 +771,8 @@ class TestSectionFields:
             section.authors = None
         with pytest.raises(ValidationError):
             section.authors = 'test'
+        with pytest.raises(ValidationError):
+            section.authors = ['']
 
     def test_number(self):
         section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
@@ -692,9 +785,9 @@ class TestSectionFields:
         section.number = pdf.UNCHECKED
         assert section.number == pdf.UNCHECKED
         with pytest.raises(ValidationError):
-            section.number = 'test'
-        with pytest.raises(ValidationError):
             section.number = []
+        with pytest.raises(ValidationError):
+            section.number = ''
 
     def test_number_kind(self):
         section = pdf.Section(**{'FirstPage': 1, 'LastPage': 1})
@@ -707,7 +800,7 @@ class TestSectionFields:
         section.number_kind = pdf.UNCHECKED
         assert section.number_kind == pdf.UNCHECKED
         with pytest.raises(ValidationError):
-            section.number_kind = 'test'
+            section.number_kind = ''
         with pytest.raises(ValidationError):
             section.number_kind = []
 
@@ -722,7 +815,7 @@ class TestSectionFields:
         section.for_edition = pdf.UNCHECKED
         assert section.for_edition == pdf.UNCHECKED
         with pytest.raises(ValidationError):
-            section.for_edition = 'test'
+            section.for_edition = ''
         with pytest.raises(ValidationError):
             section.for_edition = []
 
@@ -739,7 +832,7 @@ class TestSectionFields:
         with pytest.raises(ValidationError):
             section.heading_page = None
         with pytest.raises(ValidationError):
-            section.heading_page = 'test'
+            section.heading_page = ''
         with pytest.raises(ValidationError):
             section.heading_page = []
 
@@ -755,7 +848,7 @@ class TestSectionFields:
         with pytest.raises(ValidationError):
             section.first_page = 4
         with pytest.raises(ValidationError):
-            section.first_page = 'test'
+            section.first_page = ''
         with pytest.raises(ValidationError):
             section.first_page = []
 
@@ -774,7 +867,7 @@ class TestSectionFields:
         with pytest.raises(ValidationError):
             section.last_page = 1
         with pytest.raises(ValidationError):
-            section.last_page = 'test'
+            section.last_page = ''
         with pytest.raises(ValidationError):
             section.last_page = []
 
@@ -792,6 +885,8 @@ class TestSectionFields:
             section.topics = None
         with pytest.raises(ValidationError):
             section.topics = 'test'
+        with pytest.raises(ValidationError):
+            section.topics = ['']
 
 
 class TestReadWrite:

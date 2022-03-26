@@ -79,8 +79,15 @@ class Section(BaseModel):
 
     @validator('heading_page', 'for_edition', 'number', 'number_kind', 'kind', 'kind_in_book', 'title', pre=True)
     def not_empty_sequence(cls, v):
-        if isinstance(v, list | tuple | set):
+        if isinstance(v, list | tuple | set | str) and len(v) == 0:
             raise ValidationError('Cannot be an empty sequence')
+        return v
+
+    @validator('authors', 'topics')
+    def does_not_contain_empty_string(cls, v):
+        for i in v:
+            if i == '':
+                raise ValidationError('Empty string is invalid')
         return v
 
     @root_validator
@@ -116,7 +123,7 @@ class Plate(BaseModel):
 
     @validator('number', 'number_kind', pre=True)
     def not_empty_sequence(cls, v):
-        if isinstance(v, list | tuple | set):
+        if isinstance(v, list | tuple | set | str) and len(v) == 0:
             raise ValidationError('Cannot be an empty sequence')
         return v
 
@@ -130,7 +137,7 @@ class Signature(BaseModel):
 
     @validator('name', pre=True)
     def not_empty_sequence(cls, v):
-        if isinstance(v, list | tuple | set):
+        if isinstance(v, list | tuple | set | str) and len(v) == 0:
             raise ValidationError('Cannot be an empty sequence')
         return v
 
@@ -196,9 +203,23 @@ class Pdf(BaseModel):
             v = str(v) + '-01-01'
         return v
 
+    @validator('url', 'date_published', 'publishing_frequency', 'title', 'subtitle', 'long_title')
+    def is_not_empty_string(cls, v):
+        if v == '':
+            raise ValidationError('Empty string is invalid')
+        return v
+
+    @validator('authors', 'editors', 'translators', 'publishers', 'publisher_cities', 'printers', 'book_topics')
+    def does_not_contain_empty_string(cls, v):
+        for i in v:
+            if i == '':
+                raise ValidationError('Empty string is invalid')
+        return v
+
     @validator('url', 'date_published', 'publishing_frequency', 'title', 'subtitle', 'long_title', 'edition', 'volume', 'printing_number', 'numbers_offset', 'roman_numbers_offset',  'in_copyright', 'has_ligatures', pre=True)
     def not_empty_sequence(cls, v):
-        if isinstance(v, list | tuple | set):
+        """This fixes what appears to be a bug"""
+        if isinstance(v, list | tuple | set | str) and len(v) == 0:
             raise ValidationError('Cannot be an empty sequence')
         return v
 
