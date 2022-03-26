@@ -163,7 +163,7 @@
     InstanceID => { },
     DocumentID => { },
     NullTags => { List => 'Bag' },
-    UnknownTags => { List => 'Bag' },
+    UncheckedTags => { List => 'Bag' },
 
     # PageTags => {
     #     # the "Struct" entry defines the structure fields

@@ -1,7 +1,7 @@
 from subprocess import run
 import json
 import os
-from pydantic import BaseModel, PositiveInt, validator, root_validator
+from pydantic import BaseModel, PositiveInt, validator, root_validator, Field
 from pydantic.error_wrappers import ValidationError
 from pathlib import PosixPath
 import uuid
@@ -29,10 +29,7 @@ list_fields_alias = {to_camel(i) for i in list_fields}
 
 struct_fields = {'sections', 'signatures', 'plates'}
 
-class Unchecked(object):
-    def __bool__(self):
-        return False
-
+class Unchecked(BaseModel):
     def __copy__(self):
         return self
 
@@ -41,21 +38,24 @@ class Unchecked(object):
 
     def __repr__(self):
         return '<unchecked>'
+
+    def __eq__(self, other):
+        return isinstance(other, type(self))
 UNCHECKED = Unchecked()
 
 
 class Section(BaseModel):
-    kind: str = UNCHECKED
-    kind_in_book: str = UNCHECKED
-    title: str | None = UNCHECKED
-    authors: list[str] = UNCHECKED
-    number: PositiveInt | None = UNCHECKED
-    number_kind: str | None = UNCHECKED
-    for_edition: PositiveInt | None = UNCHECKED
-    heading_page: PositiveInt = UNCHECKED
+    kind: str | Unchecked = UNCHECKED
+    kind_in_book: str | Unchecked = UNCHECKED
+    title: str | None | Unchecked = UNCHECKED
+    authors: list[str] | Unchecked = UNCHECKED
+    number: PositiveInt | None | Unchecked = UNCHECKED
+    number_kind: str | None | Unchecked = UNCHECKED
+    for_edition: PositiveInt | None | Unchecked = UNCHECKED
+    heading_page: PositiveInt | Unchecked = UNCHECKED
     first_page: PositiveInt
     last_page: PositiveInt
-    topics: list[str] = UNCHECKED
+    topics: list[str] | Unchecked = UNCHECKED
 
     class Config:
         alias_generator = to_camel
@@ -63,14 +63,24 @@ class Section(BaseModel):
 
     @validator('kind')
     def valid_kind(cls, v):
+        if v == UNCHECKED:
+            return v
         if v not in section_kinds:
             raise ValidationError('Invalid value for Section.kind')
         return v
 
     @validator('number_kind')
     def valid_number_kind(cls, v):
-        if v not in number_kinds.union({UNCHECKED, None}):
+        if v == UNCHECKED or v is None:
+            return v
+        if v not in number_kinds:
             raise ValidationError('Invalid value for Section.number_kind')
+        return v
+
+    @validator('kind_in_book', 'title', pre=True)
+    def not_empty_sequence(cls, v):
+        if isinstance(v, list | tuple | set):
+            raise ValidationError('Cannot be an empty sequence')
         return v
 
     @root_validator
@@ -81,16 +91,16 @@ class Section(BaseModel):
 
     @root_validator
     def heading_in_range(cls, values):
-        if values['heading_page'] is not UNCHECKED:
+        if values['heading_page'] != UNCHECKED:
             if not (values['first_page'] <= values['heading_page'] <= values['last_page']):
                 raise ValidationError('heading_page must be between first_page and last_page')
         return values
 
 
 class Plate(BaseModel):
-    number: int | None = UNCHECKED
-    number_kind: str | None = UNCHECKED
-    pages: list[PositiveInt]
+    number: int | None | Unchecked = UNCHECKED
+    number_kind: str | None | Unchecked = UNCHECKED
+    pages: list[PositiveInt] = Field(min_items=1)
 
     class Config:
         alias_generator = to_camel
@@ -98,66 +108,80 @@ class Plate(BaseModel):
 
     @validator('number_kind')
     def valid_number_kind(cls, v):
+        if v is None or v == UNCHECKED:
+            return v
         if v not in number_kinds:
             raise ValidationError('Invalid value for Plate.number_kind')
         return v
 
+    @validator('number', 'number_kind', pre=True)
+    def not_empty_sequence(cls, v):
+        if isinstance(v, list | tuple | set):
+            raise ValidationError('Cannot be an empty sequence')
+        return v
+
 class Signature(BaseModel):
-    name: str = UNCHECKED
+    name: str | Unchecked = UNCHECKED
     page: PositiveInt
 
     class Config:
         alias_generator = to_camel
         validate_assignment = True
 
+    @validator('name', pre=True)
+    def not_empty_sequence(cls, v):
+        if isinstance(v, list | tuple | set):
+            raise ValidationError('Cannot be an empty sequence')
+        return v
+
 class Pdf(BaseModel):
     source_file: str
-    url: str | None = UNCHECKED
+    url: str | None | Unchecked = UNCHECKED
 
-    authors: list[str] = UNCHECKED
-    editors: list[str] = UNCHECKED
-    translators: list[str] = UNCHECKED
+    authors: list[str] | Unchecked = UNCHECKED
+    editors: list[str] | Unchecked = UNCHECKED
+    translators: list[str] | Unchecked = UNCHECKED
 
-    date_published: str | None = UNCHECKED
-    publishing_frequency: str | None = UNCHECKED
+    date_published: str | None | Unchecked = UNCHECKED
+    publishing_frequency: str | None | Unchecked = UNCHECKED
 
-    title: str | None = UNCHECKED
-    subtitle: str | None = UNCHECKED
-    long_title: str | None = UNCHECKED
-    edition: PositiveInt | None = UNCHECKED
-    volume: PositiveInt | None = UNCHECKED
+    title: str | None | Unchecked = UNCHECKED
+    subtitle: str | None | Unchecked = UNCHECKED
+    long_title: str | None | Unchecked = UNCHECKED
+    edition: PositiveInt | None | Unchecked = UNCHECKED
+    volume: PositiveInt | None | Unchecked = UNCHECKED
 
-    in_copyright: bool | None = UNCHECKED
-    copyright_years: list[PositiveInt] = UNCHECKED
-    publishers: list[str] = UNCHECKED
-    publisher_cities: list[str] = UNCHECKED
-    printers: list[str] = UNCHECKED
-    printing_number: PositiveInt | None = UNCHECKED
+    in_copyright: bool | None | Unchecked = UNCHECKED
+    copyright_years: list[PositiveInt] | Unchecked = UNCHECKED
+    publishers: list[str] | Unchecked = UNCHECKED
+    publisher_cities: list[str] | Unchecked = UNCHECKED
+    printers: list[str] | Unchecked = UNCHECKED
+    printing_number: PositiveInt | None | Unchecked = UNCHECKED
 
-    numbers_offset: PositiveInt | None = UNCHECKED
-    roman_numbers_offset: PositiveInt | None = UNCHECKED
+    numbers_offset: PositiveInt | None | Unchecked = UNCHECKED
+    roman_numbers_offset: PositiveInt | None | Unchecked = UNCHECKED
 
-    has_ligatures: bool = UNCHECKED
+    has_ligatures: bool | Unchecked = UNCHECKED
 
-    book_topics: list[str] = UNCHECKED
+    book_topics: list[str] | Unchecked = UNCHECKED
 
-    blank_pages: list[PositiveInt] = UNCHECKED
-    title_pages: list[PositiveInt] = UNCHECKED
-    publishing_info_pages: list[PositiveInt] = UNCHECKED
-    front_cover_pages: list[PositiveInt] = UNCHECKED
-    back_cover_pages: list[PositiveInt] = UNCHECKED
-    end_paper_pages: list[PositiveInt] = UNCHECKED
-    printing_info_pages: list[PositiveInt] = UNCHECKED
-    half_title_pages: list[PositiveInt] = UNCHECKED
-    frontispiece_pages: list[PositiveInt] = UNCHECKED
-    illustration_pages: list[PositiveInt] = UNCHECKED
-    advertisement_partial_pages: list[PositiveInt] = UNCHECKED
-    advertisement_full_pages: list[PositiveInt] = UNCHECKED
-    photograph_pages: list[PositiveInt] = UNCHECKED
+    blank_pages: list[PositiveInt] | Unchecked = UNCHECKED
+    title_pages: list[PositiveInt] | Unchecked = UNCHECKED
+    publishing_info_pages: list[PositiveInt] | Unchecked = UNCHECKED
+    front_cover_pages: list[PositiveInt] | Unchecked = UNCHECKED
+    back_cover_pages: list[PositiveInt] | Unchecked = UNCHECKED
+    end_paper_pages: list[PositiveInt] | Unchecked = UNCHECKED
+    printing_info_pages: list[PositiveInt] | Unchecked = UNCHECKED
+    half_title_pages: list[PositiveInt] | Unchecked = UNCHECKED
+    frontispiece_pages: list[PositiveInt] | Unchecked = UNCHECKED
+    illustration_pages: list[PositiveInt] | Unchecked = UNCHECKED
+    advertisement_partial_pages: list[PositiveInt] | Unchecked = UNCHECKED
+    advertisement_full_pages: list[PositiveInt] | Unchecked = UNCHECKED
+    photograph_pages: list[PositiveInt] | Unchecked = UNCHECKED
 
-    signatures: list[Signature] = UNCHECKED
-    plates: list[Plate] = UNCHECKED
-    sections: list[Section] = UNCHECKED
+    signatures: list[Signature] | Unchecked = UNCHECKED
+    plates: list[Plate] | Unchecked = UNCHECKED
+    sections: list[Section] | Unchecked = UNCHECKED
 
     page_count: int
 
@@ -165,27 +189,35 @@ class Pdf(BaseModel):
     class Config:
         validate_assignment = True
         alias_generator = to_camel
-        json_encoders = {
-            PosixPath: lambda v: str(v),
-        }
 
-    @validator('date_published')
+    @validator('date_published', pre=True)
     def int_date(cls, v):
         if isinstance(v, int):
             v = str(v) + '-01-01'
+        return v
+
+    @validator('url', 'date_published', 'publishing_frequency', 'title', 'subtitle', 'long_title', 'edition', 'volume', 'printing_number', 'numbers_offset', 'roman_numbers_offset',  'in_copyright', 'has_ligatures', pre=True)
+    def not_empty_sequence(cls, v):
+        if isinstance(v, list | tuple | set):
+            raise ValidationError('Cannot be an empty sequence')
         return v
 
 
     @classmethod
     def from_path(cls, pdf_path):
         in_dict = exiftool_read(pdf_path, ['-XMP-smc:all', '-PageCount'])
-        for tag in in_dict.get('NullTags', []):
-            if tag in list_fields_alias:
-                in_dict[tag] = []
-            else:
-                in_dict[tag] = None
-        for tag in in_dict.get('UncheckedTags', []):
-            in_dict[tag] = UNCHECKED
+        if 'NullTags' in in_dict:
+            for tag in in_dict['NullTags']:
+                if tag in list_fields_alias:
+                    in_dict[tag] = []
+                else:
+                    in_dict[tag] = None
+            del in_dict['NullTags']
+
+        if 'UncheckedTags' in in_dict:
+            for tag in in_dict['UncheckedTags']:
+                in_dict[tag] = UNCHECKED
+            del in_dict['UncheckedTags']
 
         return cls(**in_dict)
 
@@ -208,7 +240,7 @@ class Pdf(BaseModel):
             if (field in out_dict) & (out_dict[field] in [None, []]):
                 null_tags.append(field)
                 del out_dict[field]
-            elif (field in out_dict) & (out_dict[field] is UNCHECKED):
+            elif (field in out_dict) & (out_dict[field] == UNCHECKED):
                 unchecked_tags.append(field)
                 del out_dict[field]
 
@@ -237,17 +269,22 @@ class Pdf(BaseModel):
         params = ['exiftool', '-config', '.ExifTool_config', f'-json={temp_file}'] + params + [str(self.source_file)]
         returned = run(params, capture_output=True)
         os.remove(temp_file)
-        if b'0 image files updated in returned.stderr':
+        if b'0 image files updated' in returned.stderr:
             raise ExifToolError(f'Exiftool exited with a return code of {returned.returncode}: {returned.stderr.decode()}')
         raise_error_if_necessary(returned)
+        try:
+            new_metadata = self.from_path(self.source_file)
+        except ValidationError:
+            os.remove(self.source_file)
+            os.rename(self.source_file + '_original', self.source_file)
+            raise RuntimeError('Metadata cannot be parsed after writing')
 
-        new_metadata = self.from_path(self.source_file)
         if new_metadata == self:
             os.remove(self.source_file + '_original')
         else:
             os.remove(self.source_file)
             os.rename(self.source_file + '_original', self.source_file)
-            raise RuntimeError('PdfMetadata cannot be reproduced after writing with exiftool')
+            raise RuntimeError('Metadata is parsed after writing but does not match')
 
     def repair_xmp(self):
         params = ['exiftool', '-config', '.ExifTool_config', '-xmp:all=', '-tagsfromfile', '@', '-xmp:all', str(self.source_file)]
