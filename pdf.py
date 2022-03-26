@@ -53,8 +53,8 @@ class Section(BaseModel):
     number_kind: str | None | Unchecked = UNCHECKED
     for_edition: PositiveInt | None | Unchecked = UNCHECKED
     heading_page: PositiveInt
-    first_page: PositiveInt
-    last_page: PositiveInt
+    first_page: PositiveInt | Unchecked = UNCHECKED
+    last_page: PositiveInt | Unchecked = UNCHECKED
     topics: list[str] | Unchecked = UNCHECKED
 
     class Config:
@@ -77,7 +77,7 @@ class Section(BaseModel):
             raise ValidationError('Invalid value for Section.number_kind')
         return v
 
-    @validator('heading_page', 'for_edition', 'number', 'number_kind', 'kind', 'kind_in_book', 'title', pre=True)
+    @validator('heading_page', 'for_edition', 'number', 'number_kind', 'kind', 'kind_in_book', 'title', 'first_page', 'last_page', pre=True)
     def not_empty_sequence(cls, v):
         if isinstance(v, list | tuple | set | str) and len(v) == 0:
             raise ValidationError('Cannot be an empty sequence')
@@ -91,16 +91,15 @@ class Section(BaseModel):
         return v
 
     @root_validator
-    def last_after_first(cls, values):
-        if values['last_page'] < values['first_page']:
-            raise ValidationError('last_page cannot be less than first_page')
+    def first_before_heading(cls, values):
+        if values['first_page'] != UNCHECKED and values['first_page'] > values['heading_page']:
+            raise ValidationError('first_page must be before heading_page')
         return values
 
     @root_validator
-    def heading_in_range(cls, values):
-        if values['heading_page'] != UNCHECKED:
-            if not (values['first_page'] <= values['heading_page'] <= values['last_page']):
-                raise ValidationError('heading_page must be between first_page and last_page')
+    def last_after_heading(cls, values):
+        if values['last_page'] != UNCHECKED and values['last_page'] < values['heading_page']:
+            raise ValidationError('last_page must be after heading_page')
         return values
 
 
