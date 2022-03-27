@@ -63,9 +63,9 @@
     # new XMP namespaces (eg. xxx) must be added to the Main XMP table:
     'Image::ExifTool::XMP::Main' => {
         # namespace definition for examples 8 to 11
-        smc => { # <-- must be the same as the NAMESPACE prefix
+        lsmc => { # <-- must be the same as the NAMESPACE prefix
             SubDirectory => {
-                TagTable => 'Image::ExifTool::UserDefined::smc',
+                TagTable => 'Image::ExifTool::UserDefined::lsmc',
                 # (see the definition of this table below)
             },
         },
@@ -78,9 +78,9 @@
 # in the %Image::ExifTool::UserDefined definition above.
 # The namespace prefix for these tags is 'xxx', which corresponds to
 # an ExifTool family 1 group name of 'XMP-xxx'.
-%Image::ExifTool::UserDefined::smc = (
-    GROUPS => { 0 => 'XMP', 1 => 'XMP-smc', 2 => 'Document' },
-    NAMESPACE => { 'smc' => 'http://ns.scienceandmaterialculture.org/smc/1.0/' },
+%Image::ExifTool::UserDefined::lsmc = (
+    GROUPS => { 0 => 'XMP', 1 => 'XMP-lsmc', 2 => 'Document' },
+    NAMESPACE => { 'lsmc' => 'http://ns.scienceandmaterialculture.org/lsmc/1.0/' },
     WRITABLE => 'string', # (default to string-type tags)
 
     Url => { },
@@ -126,14 +126,6 @@
     AdvertisementPartialPages => { List => 'Bag', Writeable => 'integer' },
     PhotographPages => { List => 'Bag', Writeable => 'integer' },
 
-    Signatures => {
-        List => 'Bag',
-        Struct => {
-            Name => {},
-            Page => { Writeable => 'integer' },
-        }
-    },
-
     Plates => {
         List => 'Bag',
         Struct => {
@@ -156,7 +148,7 @@
             HeadingPage => { Writeable => 'integer' },
             FirstPage => { Writeable => 'integer' },
             LastPage => { Writeable => 'integer' },
-            Topics => { List => 'Bag' },
+            SectionTopics => { List => 'Bag' },
         },
     },
 

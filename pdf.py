@@ -1,7 +1,7 @@
 from subprocess import run
 import json
 import os
-from pydantic import BaseModel, PositiveInt, validator, root_validator, Field
+from pydantic import BaseModel, PositiveInt, validator, root_validator, Field, PrivateAttr
 from pydantic.error_wrappers import ValidationError
 from pathlib import PosixPath
 import uuid
@@ -27,9 +27,12 @@ list_fields = {'authors', 'editors', 'translators', 'copyright_years', 'publishe
 
 list_fields_alias = {to_camel(i) for i in list_fields}
 
-struct_fields = {'sections', 'signatures', 'plates'}
+struct_fields = {'sections', 'plates'}
 
 class Unchecked(BaseModel):
+    def __bool__(self):
+        return False
+
     def __copy__(self):
         return self
 
@@ -55,7 +58,9 @@ class Section(BaseModel):
     heading_page: PositiveInt
     first_page: PositiveInt | Unchecked = UNCHECKED
     last_page: PositiveInt | Unchecked = UNCHECKED
-    topics: list[str] | Unchecked = UNCHECKED
+    section_topics: list[str] | Unchecked = UNCHECKED
+
+    page_count: PositiveInt
 
     class Config:
         alias_generator = to_camel
@@ -83,7 +88,7 @@ class Section(BaseModel):
             raise ValidationError('Cannot be an empty sequence')
         return v
 
-    @validator('authors', 'topics')
+    @validator('authors', 'section_topics')
     def does_not_contain_empty_string(cls, v):
         for i in v:
             if i == '':
@@ -102,6 +107,16 @@ class Section(BaseModel):
             raise ValidationError('last_page must be after heading_page')
         return values
 
+    @root_validator
+    def page_numbers_lt_page_count(cls, values):
+        for field in ['heading_page', 'first_page', 'last_page']:
+            if values[field] and values[field] > values['page_count']:
+                raise ValidationError(f'{field} cannot be higher than page_count')
+        return values
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
 
 class Plate(BaseModel):
     number: int | None | Unchecked = UNCHECKED
@@ -111,6 +126,9 @@ class Plate(BaseModel):
     class Config:
         alias_generator = to_camel
         validate_assignment = True
+
+    def __getitem__(self, item):
+        return getattr(self, item)
 
     @validator('number_kind')
     def valid_number_kind(cls, v):
@@ -126,19 +144,6 @@ class Plate(BaseModel):
             raise ValidationError('Cannot be an empty sequence')
         return v
 
-class Signature(BaseModel):
-    name: str | Unchecked = UNCHECKED
-    page: PositiveInt
-
-    class Config:
-        alias_generator = to_camel
-        validate_assignment = True
-
-    @validator('name', pre=True)
-    def not_empty_sequence(cls, v):
-        if isinstance(v, list | tuple | set | str) and len(v) == 0:
-            raise ValidationError('Cannot be an empty sequence')
-        return v
 
 class Pdf(BaseModel):
     source_file: str
@@ -185,7 +190,6 @@ class Pdf(BaseModel):
     advertisement_full_pages: list[PositiveInt] | Unchecked = UNCHECKED
     photograph_pages: list[PositiveInt] | Unchecked = UNCHECKED
 
-    signatures: list[Signature] | Unchecked = UNCHECKED
     plates: list[Plate] | Unchecked = UNCHECKED
     sections: list[Section] | Unchecked = UNCHECKED
 
@@ -202,6 +206,18 @@ class Pdf(BaseModel):
             v = str(v) + '-01-01'
         return v
 
+    @root_validator
+    def page_numbers_lt_page_count(cls, values):
+        for field in ['numbers_offset', 'roman_numbers_offset']:
+            if values[field] and values[field] > values['page_count']:
+                raise ValidationError(f'{field} cannot be higher than page_count')
+        for field in ['blank_pages', 'title_pages', 'publishing_info_pages', 'front_cover_pages', 'back_cover_pages', 'end_paper_pages', 'printing_info_pages', 'half_title_pages', 'frontispiece_pages', 'illustration_pages', 'advertisement_partial_pages', 'advertisement_full_pages', 'photograph_pages']:
+            if values[field]:
+                for value in values[field]:
+                    if value > values['page_count']:
+                        raise ValidationError(f'{field} contains a number higher than page_count')
+        return values
+
     @validator('url', 'date_published', 'publishing_frequency', 'title', 'subtitle', 'long_title')
     def is_not_empty_string(cls, v):
         if v == '':
@@ -217,15 +233,24 @@ class Pdf(BaseModel):
 
     @validator('url', 'date_published', 'publishing_frequency', 'title', 'subtitle', 'long_title', 'edition', 'volume', 'printing_number', 'numbers_offset', 'roman_numbers_offset',  'in_copyright', 'has_ligatures', pre=True)
     def not_empty_sequence(cls, v):
-        """This fixes what appears to be a bug"""
         if isinstance(v, list | tuple | set | str) and len(v) == 0:
             raise ValidationError('Cannot be an empty sequence')
         return v
 
+    @validator('sections', pre=True)
+    def list_not_contain_empty_sequence(cls, v):
+        if isinstance(v, list | set | tuple):
+            for empty_seq in [[], '', (), {}]:
+                if empty_seq in v:
+                    raise ValidationError('Cannot initialize section with empty sequence')
+        return v
+
+    def __getitem__(self, item):
+        return getattr(self, item)
 
     @classmethod
     def from_path(cls, pdf_path):
-        in_dict = exiftool_read(pdf_path, ['-XMP-smc:all', '-PageCount'])
+        in_dict = exiftool_read(pdf_path, ['-XMP-lsmc:all', '-PageCount'])
         if 'NullTags' in in_dict:
             for tag in in_dict['NullTags']:
                 if tag in list_fields_alias:
@@ -270,7 +295,7 @@ class Pdf(BaseModel):
         if unchecked_tags:
             out_dict['UncheckedTags'] = unchecked_tags
 
-        out_dict = {f'XMP-smc:{k}':v for k,v in out_dict.items()}
+        out_dict = {f'XMP-lsmc:{k}':v for k,v in out_dict.items()}
         out_dict.update({'SourceFile': self.source_file})
         return out_dict
 
@@ -278,10 +303,10 @@ class Pdf(BaseModel):
         out_dict = self.exiftool_dict()
 
         params = []
-        for tag in out_dict.get('XMP-smc:NullTags', []):
-            params.append(f'-XMP-smc:{tag}=')
-        for tag in out_dict.get('XMP-smc:UncheckedTags', []):
-            params.append(f'-XMP-smc:{tag}=')
+        for tag in out_dict.get('XMP-lsmc:NullTags', []):
+            params.append(f'-XMP-lsmc:{tag}=')
+        for tag in out_dict.get('XMP-lsmc:UncheckedTags', []):
+            params.append(f'-XMP-lsmc:{tag}=')
 
         temp_file = '.temp.json'
         with open(temp_file, 'w', encoding='utf-8') as f:
