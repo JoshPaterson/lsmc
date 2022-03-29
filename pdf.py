@@ -15,19 +15,29 @@ def uuid_str():
 
 section_kinds = {'introduction', 'acknowledgement', 'dedication', 'preface', 'chapter', 'table', 'appendix', 'glossary', 'index', 'table_of_contents', 'bibliography', 'publishers_catalog', 'appendix', 'article', 'appendices', 'tables', 'chapter_group', 'plates'}
 
+page_kinds = {'blank', 'title', 'publishing_info', 'printing_info', 'front_cover', 'back_cover', 'decorative_paper', 'half_title', 'front_jacket', 'front_jacket_flap', 'back_jacket', 'back_jacket_flap', 'full_ad', 'partial_ad', 'equations'}
+
+number_kinds = {'roman_upper', 'roman_lower', 'arabic', 'letter_upper', 'letter_lower'}
+
 def to_camel(string: str) -> str:
     return ''.join(word.capitalize() for word in string.split('_'))
 
 ineditable_fields = {'source_file', 'page_count'}
 ineditable_fields_alias = {to_camel(v) for v in ineditable_fields}
 
-number_kinds = {'roman_upper', 'roman_lower', 'arabic', 'letter_upper', 'letter_lower'}
-
-list_fields = {'authors', 'editors', 'translators', 'copyright_years', 'publishers', 'publisher_cities', 'printers', 'book_topics', 'page_groups', 'blank_pages', 'title_pages', 'publishing_info_pages', 'front_cover_pages', 'back_cover_pages', 'end_paper_pages', 'printing_info_pages', 'half_title_pages', 'frontispiece_pages', 'illustration_pages', 'advertisement_partial_pages', 'advertisement_full_pages', 'photograph_pages'}
-
+str_fields = {'url', 'date_published', 'publishing_frequency', 'title', 'subtitle', 'long_title'}
+bool_fields = {'in_copyright', 'has_ligatures'}
+int_fields = {'volume', 'edition', 'printing_number', 'numbers_offset', 'roman_numbers_offset'}
+list_fields = {'authors', 'editors', 'translators', 'copyright_years', 'publishers', 'publisher_cities', 'printers', 'book_topics'}
 list_fields_alias = {to_camel(i) for i in list_fields}
+struct_fields = {'sections', 'graphics', 'page_tags'}
 
-struct_fields = {'sections', 'plates'}
+section_str_fields = {'kind', 'kind_in_book', 'title', 'number_kind'}
+section_int_fields = {'for_edition', 'first_page', 'last_page', 'heading_page', 'number'}
+section_list_fields = {'authors', 'section_topics'}
+
+graphic_str_fields = {'kind', 'content', 'color'}
+graphic_int_fields = {'first_page', 'last_page'}
 
 class Unchecked(BaseModel):
     def __bool__(self):
@@ -118,10 +128,14 @@ class Section(BaseModel):
         return getattr(self, item)
 
 
-class Plate(BaseModel):
-    number: int | None | Unchecked = UNCHECKED
-    number_kind: str | None | Unchecked = UNCHECKED
-    pages: list[PositiveInt] = Field(min_items=1)
+class Graphic(BaseModel):
+    kind: str | None | Unchecked = UNCHECKED
+    content: str | None | Unchecked = UNCHECKED
+    first_page: PositiveInt
+    last_page: PositiveInt | Unchecked = UNCHECKED
+    color: str | Unchecked = UNCHECKED
+
+    page_count: PositiveInt
 
     class Config:
         alias_generator = to_camel
@@ -130,19 +144,51 @@ class Plate(BaseModel):
     def __getitem__(self, item):
         return getattr(self, item)
 
-    @validator('number_kind')
-    def valid_number_kind(cls, v):
-        if v is None or v == UNCHECKED:
-            return v
-        if v not in number_kinds:
-            raise ValidationError('Invalid value for Plate.number_kind')
-        return v
-
-    @validator('number', 'number_kind', pre=True)
+    @validator('kind', 'content', 'color', 'last_page', pre=True)
     def not_empty_sequence(cls, v):
         if isinstance(v, list | tuple | set | str) and len(v) == 0:
             raise ValidationError('Cannot be an empty sequence')
         return v
+
+    @root_validator
+    def last_page_after_first(cls, values):
+        if values['last_page'] and values['first_page'] > values['last_page']:
+            raise ValidationError('last_page must be after first_page')
+        return values
+
+    @root_validator
+    def page_numbers_lt_page_count(cls, values):
+        for field in ['first_page', 'last_page']:
+            if values[field] and values[field] > values['page_count']:
+                raise ValidationError(f'{field} cannot be higher than page_count')
+        return values
+
+
+class PageTag(BaseModel):
+    kind: str
+    pages: list[PositiveInt] = []
+
+    page_count: PositiveInt
+
+    class Config:
+        alias_generator = to_camel
+        validate_assignment = True
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+    @root_validator
+    def page_numbers_lt_page_count(cls, values):
+        if values['pages'] and max(values['pages']) > values['page_count']:
+            raise ValidationError('pages cannot be higher than page_count')
+        return values
+
+    @validator('kind', pre=True)
+    def not_empty_sequence(cls, v):
+        if isinstance(v, list | tuple | set | str) and len(v) == 0:
+            raise ValidationError('Cannot be an empty sequence')
+        return v
+
 
 
 class Pdf(BaseModel):
@@ -176,25 +222,11 @@ class Pdf(BaseModel):
 
     book_topics: list[str] | Unchecked = UNCHECKED
 
-    blank_pages: list[PositiveInt] | Unchecked = UNCHECKED
-    title_pages: list[PositiveInt] | Unchecked = UNCHECKED
-    publishing_info_pages: list[PositiveInt] | Unchecked = UNCHECKED
-    front_cover_pages: list[PositiveInt] | Unchecked = UNCHECKED
-    back_cover_pages: list[PositiveInt] | Unchecked = UNCHECKED
-    end_paper_pages: list[PositiveInt] | Unchecked = UNCHECKED
-    printing_info_pages: list[PositiveInt] | Unchecked = UNCHECKED
-    half_title_pages: list[PositiveInt] | Unchecked = UNCHECKED
-    frontispiece_pages: list[PositiveInt] | Unchecked = UNCHECKED
-    illustration_pages: list[PositiveInt] | Unchecked = UNCHECKED
-    advertisement_partial_pages: list[PositiveInt] | Unchecked = UNCHECKED
-    advertisement_full_pages: list[PositiveInt] | Unchecked = UNCHECKED
-    photograph_pages: list[PositiveInt] | Unchecked = UNCHECKED
-
-    plates: list[Plate] | Unchecked = UNCHECKED
+    page_tags: list[PageTag] | Unchecked = UNCHECKED
+    graphics: list[Graphic] | Unchecked = UNCHECKED
     sections: list[Section] | Unchecked = UNCHECKED
 
     page_count: int
-
 
     class Config:
         validate_assignment = True
@@ -211,11 +243,6 @@ class Pdf(BaseModel):
         for field in ['numbers_offset', 'roman_numbers_offset']:
             if values[field] and values[field] > values['page_count']:
                 raise ValidationError(f'{field} cannot be higher than page_count')
-        for field in ['blank_pages', 'title_pages', 'publishing_info_pages', 'front_cover_pages', 'back_cover_pages', 'end_paper_pages', 'printing_info_pages', 'half_title_pages', 'frontispiece_pages', 'illustration_pages', 'advertisement_partial_pages', 'advertisement_full_pages', 'photograph_pages']:
-            if values[field]:
-                for value in values[field]:
-                    if value > values['page_count']:
-                        raise ValidationError(f'{field} contains a number higher than page_count')
         return values
 
     @validator('url', 'date_published', 'publishing_frequency', 'title', 'subtitle', 'long_title')
@@ -237,7 +264,7 @@ class Pdf(BaseModel):
             raise ValidationError('Cannot be an empty sequence')
         return v
 
-    @validator('sections', pre=True)
+    @validator('sections', 'graphics', 'page_tags', pre=True)
     def list_not_contain_empty_sequence(cls, v):
         if isinstance(v, list | set | tuple):
             for empty_seq in [[], '', (), {}]:

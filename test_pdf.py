@@ -356,252 +356,21 @@ class TestPdfFields():
         with pytest.raises(ValidationError):
             book.book_topics = ['']
 
-    def test_blank_pages(self):
-        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
-        assert book.blank_pages == pdf.UNCHECKED
-        v = [1,2,3]
-        book.blank_pages = v
-        assert book.blank_pages == v
-        book.blank_pages = []
-        assert book.blank_pages == []
-        book.blank_pages = pdf.UNCHECKED
-        assert book.book_topics == pdf.UNCHECKED
+    def test_page_tags(self):
+        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 34})
+        assert book.page_tags == pdf.UNCHECKED
+        book.page_tags = [pdf.PageTag(**{'Kind': 'blank', 'Pages': [1, 3, 5], 'PageCount': book.page_count}), pdf.PageTag(**{'Kind': 'title', 'Pages': [4], 'PageCount': book.page_count})]
+        assert book.page_tags[0].kind == 'blank'
+        assert book.page_tags[0].pages == [1, 3, 5]
+        assert book.page_tags[1].kind == 'title'
+        assert book.page_tags[1].pages == [4]
         with pytest.raises(ValidationError):
-            book.blank_pages = None
-        with pytest.raises(ValidationError):
-            book.blank_pages = 1
-        with pytest.raises(ValidationError):
-            book.blank_pages = ['']
-        with pytest.raises(ValidationError):
-            book.blank_pages = [50]
+            book.page_tags[0].pages = ['']
+        book.page_tags = []
+        assert book.page_tags == []
+        book.page_tags = pdf.UNCHECKED
+        assert book.page_tags == pdf.UNCHECKED
 
-    def test_title_pages(self):
-        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
-        assert book.title_pages == pdf.UNCHECKED
-        v = [1,2,3]
-        book.title_pages = v
-        assert book.title_pages == v
-        book.title_pages = []
-        assert book.title_pages == []
-        book.title_pages = pdf.UNCHECKED
-        assert book.title_pages == pdf.UNCHECKED
-        with pytest.raises(ValidationError):
-            book.title_pages = None
-        with pytest.raises(ValidationError):
-            book.title_pages = 1
-        with pytest.raises(ValidationError):
-            book.title_pages = ['']
-        with pytest.raises(ValidationError):
-            book.title_pages = [50]
-
-    def test_publishing_info_pages(self):
-        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
-        assert book.publishing_info_pages == pdf.UNCHECKED
-        v = [1,2,3]
-        book.publishing_info_pages = v
-        assert book.publishing_info_pages == v
-        book.publishing_info_pages = []
-        assert book.publishing_info_pages == []
-        book.publishing_info_pages = pdf.UNCHECKED
-        assert book.publishing_info_pages == pdf.UNCHECKED
-        with pytest.raises(ValidationError):
-            book.publishing_info_pages = None
-        with pytest.raises(ValidationError):
-            book.publishing_info_pages = 1
-        with pytest.raises(ValidationError):
-            book.publishing_info_pages = ['']
-        with pytest.raises(ValidationError):
-            book.publishing_info_pages = [50]
-
-    def test_front_cover_pages(self):
-        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
-        assert book.front_cover_pages == pdf.UNCHECKED
-        v = [1,2,3]
-        book.front_cover_pages = v
-        assert book.front_cover_pages == v
-        book.front_cover_pages = []
-        assert book.front_cover_pages == []
-        book.front_cover_pages = pdf.UNCHECKED
-        assert book.front_cover_pages == pdf.UNCHECKED
-        with pytest.raises(ValidationError):
-            book.front_cover_pages = None
-        with pytest.raises(ValidationError):
-            book.front_cover_pages = 1
-        with pytest.raises(ValidationError):
-            book.front_cover_pages = ['']
-        with pytest.raises(ValidationError):
-            book.front_cover_pages = [50]
-
-    def test_back_cover_pages(self):
-        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
-        assert book.back_cover_pages == pdf.UNCHECKED
-        v = [1,2,3]
-        book.back_cover_pages = v
-        assert book.back_cover_pages == v
-        book.back_cover_pages = []
-        assert book.back_cover_pages == []
-        book.back_cover_pages = pdf.UNCHECKED
-        assert book.back_cover_pages == pdf.UNCHECKED
-        with pytest.raises(ValidationError):
-            book.back_cover_pages = None
-        with pytest.raises(ValidationError):
-            book.back_cover_pages = 1
-        with pytest.raises(ValidationError):
-            book.back_cover_pages = ['']
-        with pytest.raises(ValidationError):
-            book.back_cover_pages = [50]
-
-    def test_end_paper_pages(self):
-        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
-        assert book.end_paper_pages == pdf.UNCHECKED
-        v = [1,2,3]
-        book.end_paper_pages = v
-        assert book.end_paper_pages == v
-        book.end_paper_pages = []
-        assert book.end_paper_pages == []
-        book.end_paper_pages= pdf.UNCHECKED
-        assert book.end_paper_pages== pdf.UNCHECKED
-        with pytest.raises(ValidationError):
-            book.end_paper_pages = None
-        with pytest.raises(ValidationError):
-            book.end_paper_pages = 1
-        with pytest.raises(ValidationError):
-            book.end_paper_pages = ['']
-        with pytest.raises(ValidationError):
-            book.end_paper_pages = [50]
-
-    def test_printing_info_pages(self):
-        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
-        assert book.printing_info_pages == pdf.UNCHECKED
-        v = [1,2,3]
-        book.printing_info_pages = v
-        assert book.printing_info_pages == v
-        book.printing_info_pages = []
-        assert book.printing_info_pages == []
-        book.printing_info_pages = pdf.UNCHECKED
-        assert book.printing_info_pages == pdf.UNCHECKED
-        with pytest.raises(ValidationError):
-            book.printing_info_pages = None
-        with pytest.raises(ValidationError):
-            book.printing_info_pages = 1
-        with pytest.raises(ValidationError):
-            book.printing_info_pages = ['']
-        with pytest.raises(ValidationError):
-            book.printing_info_pages = [50]
-
-    def test_half_title_pages(self):
-        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
-        assert book.half_title_pages == pdf.UNCHECKED
-        v = [1,2,3]
-        book.half_title_pages = v
-        assert book.half_title_pages == v
-        book.half_title_pages = []
-        assert book.half_title_pages == []
-        book.half_title_pages = pdf.UNCHECKED
-        assert book.half_title_pages == pdf.UNCHECKED
-        with pytest.raises(ValidationError):
-            book.half_title_pages = None
-        with pytest.raises(ValidationError):
-            book.half_title_pages = 1
-        with pytest.raises(ValidationError):
-            book.half_title_pages = ['']
-        with pytest.raises(ValidationError):
-            book.half_title_pages = [50]
-
-    def test_frontispiece_pages(self):
-        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
-        assert book.frontispiece_pages == pdf.UNCHECKED
-        v = [1,2,3]
-        book.frontispiece_pages = v
-        assert book.frontispiece_pages == v
-        book.frontispiece_pages = []
-        assert book.frontispiece_pages == []
-        book.frontispiece_pages = pdf.UNCHECKED
-        assert book.frontispiece_pages == pdf.UNCHECKED
-        with pytest.raises(ValidationError):
-            book.frontispiece_pages = None
-        with pytest.raises(ValidationError):
-            book.frontispiece_pages = 1
-        with pytest.raises(ValidationError):
-            book.frontispiece_pages = ['']
-        with pytest.raises(ValidationError):
-            book.frontispiece_pages = [50]
-
-    def test_illustration_pages(self):
-        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
-        assert book.illustration_pages == pdf.UNCHECKED
-        v = [1,2,3]
-        book.illustration_pages = v
-        assert book.illustration_pages == v
-        book.illustration_pages = []
-        assert book.illustration_pages == []
-        book.illustration_pages = pdf.UNCHECKED
-        assert book.illustration_pages == pdf.UNCHECKED
-        with pytest.raises(ValidationError):
-            book.illustration_pages = None
-        with pytest.raises(ValidationError):
-            book.illustration_pages = 1
-        with pytest.raises(ValidationError):
-            book.illustration_pages = ['']
-        with pytest.raises(ValidationError):
-            book.illustration_pages = [50]
-
-    def test_advertisement_partial_pages(self):
-        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
-        assert book.advertisement_partial_pages == pdf.UNCHECKED
-        v = [1,2,3]
-        book.advertisement_partial_pages = v
-        assert book.advertisement_partial_pages == v
-        book.advertisement_partial_pages = []
-        assert book.advertisement_partial_pages == []
-        book.advertisement_partial_pages = pdf.UNCHECKED
-        assert book.advertisement_partial_pages == pdf.UNCHECKED
-        with pytest.raises(ValidationError):
-            book.advertisement_partial_pages= None
-        with pytest.raises(ValidationError):
-            book.advertisement_partial_pages = 1
-        with pytest.raises(ValidationError):
-            book.advertisement_partial_pages = ['']
-        with pytest.raises(ValidationError):
-            book.advertisement_partial_pages = [50]
-
-    def test_advertisement_full_pages(self):
-        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
-        assert book.advertisement_full_pages == pdf.UNCHECKED
-        v = [1,2,3]
-        book.advertisement_full_pages = v
-        assert book.advertisement_full_pages == v
-        book.advertisement_full_pages = []
-        assert book.advertisement_full_pages == []
-        book.advertisement_full_pages = pdf.UNCHECKED
-        assert book.advertisement_full_pages == pdf.UNCHECKED
-        with pytest.raises(ValidationError):
-            book.advertisement_full_pages= None
-        with pytest.raises(ValidationError):
-            book.advertisement_full_pages = 1
-        with pytest.raises(ValidationError):
-            book.advertisement_full_pages = ['']
-        with pytest.raises(ValidationError):
-            book.advertisement_full_pages = [50]
-
-    def test_photograph_pages(self):
-        book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 48})
-        assert book.photograph_pages == pdf.UNCHECKED
-        v = [1,2,3]
-        book.photograph_pages = v
-        assert book.photograph_pages == v
-        book.photograph_pages = []
-        assert book.photograph_pages == []
-        book.photograph_pages = pdf.UNCHECKED
-        assert book.photograph_pages == pdf.UNCHECKED
-        with pytest.raises(ValidationError):
-            book.photograph_pages = None
-        with pytest.raises(ValidationError):
-            book.photograph_pages = 1
-        with pytest.raises(ValidationError):
-            book.photograph_pages = ['']
-        with pytest.raises(ValidationError):
-            book.photograph_pages = [50]
 
     def test_sections(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 34})
@@ -630,74 +399,119 @@ class TestPdfFields():
         with pytest.raises(ValidationError):
             book.sections = ([],)
 
-    def test_plates(self):
+    def test_graphics(self):
         book = pdf.Pdf(**{'SourceFile': 'test/test.pdf', 'PageCount': 34})
-        book.plates = [pdf.Plate(**{'Pages': [5, 6]}),
-                       pdf.Plate(**{'Pages': [7, 8]})]
-        assert book.plates[0].pages == [5, 6]
-        assert book.plates[1].pages == [7, 8]
-        book.plates = []
-        assert book.plates == []
-        book.plates = pdf.UNCHECKED
-        assert book.plates == pdf.UNCHECKED
+        book.graphics = [pdf.Graphic(**{'FirstPage': 2, 'PageCount': book.page_count}),
+                       pdf.Graphic(**{'FirstPage': 3, 'PageCount': book.page_count})]
+        assert book.graphics[0].first_page == 2
+        assert book.graphics[1].first_page == 3
         with pytest.raises(ValidationError):
-            book.plates = None
+            book.graphics[0].first_page = 40
+        book.graphics = pdf.UNCHECKED
+        assert book.graphics == pdf.UNCHECKED
+        book.graphics = []
+        assert book.graphics == []
         with pytest.raises(ValidationError):
-            book.plates = 'test'
+            book.graphics = None
         with pytest.raises(ValidationError):
-            book.plates = ['']
+            book.graphics = 'test'
         with pytest.raises(ValidationError):
-            book.plates[0].pages = [40]
+            book.graphics = ['']
 
 
-class TestPlateFields:
-    def test_number(self):
-        plate = pdf.Plate(**{'Pages':[1,2,3]})
-        assert plate.number == pdf.UNCHECKED
-        v = 3
-        plate.number = v
-        assert plate.number == v
-        plate.number = None
-        assert plate.number == None
-        plate.number = pdf.UNCHECKED
-        assert plate.number == pdf.UNCHECKED
+class TestPageTagFields:
+    def test_kind(self):
+        page_tag = pdf.PageTag(**{'Kind': 'blank', 'PageCount': 34})
+        assert page_tag.kind == 'blank'
+        v = 'title'
+        page_tag.kind= v
+        assert page_tag.kind == v
         with pytest.raises(ValidationError):
-            plate.number = []
+            page_tag.kind = None
         with pytest.raises(ValidationError):
-            plate.number = ''
-
-    def test_number_kind(self):
-        plate = pdf.Plate(**{'Pages':[1,2,3]})
-        assert plate.number_kind == pdf.UNCHECKED
-        v = 'arabic'
-        plate.number_kind = v
-        assert plate.number_kind == v
-        plate.number_kind = None
-        assert plate.number_kind == None
-        plate.number_kind = pdf.UNCHECKED
-        assert plate.number_kind == pdf.UNCHECKED
+            page_tag.kind = []
         with pytest.raises(ValidationError):
-            plate.number_kind = 'test'
-        with pytest.raises(ValidationError):
-            plate.number_kind = []
-        with pytest.raises(ValidationError):
-            plate.number_kind = ''
+            page_tag.kind = ''
 
     def test_pages(self):
-        plate = pdf.Plate(**{'Pages':[1,2,3]})
-        assert plate.pages == [1, 2, 3]
-        plate.pages.append(4)
-        assert plate.pages == [1, 2, 3, 4]
+        page_tag = pdf.PageTag(**{'Kind': 'blank', 'PageCount': 34})
+        assert page_tag.pages == []
+        v = [1, 3, 5]
+        page_tag.pages = v
+        assert page_tag.pages == v
+        page_tag.pages = []
+        assert page_tag.pages == []
         with pytest.raises(ValidationError):
-            plate.pages = []
+            page_tag.pages = None
         with pytest.raises(ValidationError):
-            plate.pages = None
+            page_tag.pages = ''
         with pytest.raises(ValidationError):
-            plate.pages = pdf.UNCHECKED
+            page_tag.pages = 3
+
+class TestGraphicFields:
+    def test_kind(self):
+        graphic = pdf.Graphic(**{'FirstPage': 2, 'PageCount': 4})
+        assert graphic.kind == pdf.UNCHECKED
+        v = 'engraving'
+        graphic.kind = v
+        assert graphic.kind == v
+        graphic.kind = None
+        assert graphic.kind == None
+        graphic.kind = pdf.UNCHECKED
+        assert graphic.kind == pdf.UNCHECKED
         with pytest.raises(ValidationError):
-            plate.pages = 3
+            graphic.kind = []
         with pytest.raises(ValidationError):
-            plate.pages = ['']
+            graphic.kind = ''
+
+    def test_content(self):
+        graphic = pdf.Graphic(**{'FirstPage': 2, 'PageCount': 4})
+        assert graphic.content == pdf.UNCHECKED
+        v = 'engraving'
+        graphic.content = v
+        assert graphic.content == v
+        graphic.content = None
+        assert graphic.content == None
+        graphic.content = pdf.UNCHECKED
+        assert graphic.content == pdf.UNCHECKED
+        with pytest.raises(ValidationError):
+            graphic.content = []
+        with pytest.raises(ValidationError):
+            graphic.content = ''
+
+    def test_first_page(self):
+        graphic = pdf.Graphic(**{'FirstPage': 2, 'PageCount': 4})
+        assert graphic.first_page == 2
+        v = 3
+        graphic.first_page = v
+        assert graphic.first_page == v
+        with pytest.raises(ValidationError):
+            graphic.first_page = pdf.UNCHECKED
+        with pytest.raises(ValidationError):
+            graphic.first_page = None
+        with pytest.raises(ValidationError):
+            graphic.first_page = []
+        with pytest.raises(ValidationError):
+            graphic.first_page = ''
+
+    def test_last_page(self):
+        graphic = pdf.Graphic(**{'FirstPage': 2, 'PageCount': 4})
+        assert graphic.last_page == pdf.UNCHECKED
+        v = 3
+        graphic.last_page = v
+        assert graphic.last_page == v
+        graphic.last_page = pdf.UNCHECKED
+        assert graphic.last_page == pdf.UNCHECKED
+        with pytest.raises(ValidationError):
+            graphic.last_page = 1
+        with pytest.raises(ValidationError):
+            graphic.last_page = 7
+        with pytest.raises(ValidationError):
+            graphic.last_page = None
+        with pytest.raises(ValidationError):
+            graphic.last_page = []
+        with pytest.raises(ValidationError):
+            graphic.last_page = ''
 
 
 class TestSectionFields:
@@ -823,6 +637,8 @@ class TestSectionFields:
             section.heading_page = ''
         with pytest.raises(ValidationError):
             section.heading_page = []
+        with pytest.raises(ValidationError):
+            section.heading_page = 30
 
     def test_first_page(self):
         section = pdf.Section(**{'HeadingPage': 1, 'PageCount': 20})
@@ -880,72 +696,107 @@ class TestReadWrite:
     def test_all_unchecked(self):
         with temp_copy('empty_no_metadata.pdf') as pdf_path:
             book = pdf.Pdf.from_path(pdf_path)
-            book.title = pdf.UNCHECKED
             book.write()
 
     def test_all_unchecked_structs(self):
         with temp_copy('empty_no_metadata.pdf') as pdf_path:
             book = pdf.Pdf.from_path(pdf_path)
-            book.sections = [pdf.Section(**{'FirstPage': 1, 'LastPage': 2, 'HeadingPage': 1})]
-            book.plates = pdf.Plate(**{'Page': 3})
+            book.sections = [pdf.Section(**{'HeadingPage': 3, 'PageCount': 34})]
+            book.graphics = [pdf.Plate(**{'FirstPage': 3, 'PageCount': 34})]
+            book.page_tags = [pdf.PageTag(**{'kind': 'blank', 'PageCount': 34})]
+            book.write()
 
     def test_all_null(self):
         with temp_copy('empty_no_metadata.pdf') as pdf_path:
             book = pdf.Pdf.from_path(pdf_path)
-            book.url = book.date_published = book.publishing_frequency = book.title = book.subtitle = book.long_title = book.edition = book.volume = book.in_copyright = book.printing_number = book.numbers_offset = book.roman_numbers_offset = book.has_ligatures = None
-            book.authors = []
-            book.editors = []
-            book.translators = []
-            book.copyright_years = []
-            book.publishers = []
-            book.publisher_cities = []
-            book.printers = []
-            book.book_topics = []
-            book.blank_pages = []
-            book.title_pages = []
-            book.publishing_info_pages = []
-            book.front_cover_pages = []
-            book.back_cover_pages = []
-            book.end_paper_pages = []
-            book.printing_info_pages = []
-            book.half_title_pages = []
-            book.frontispiece_pages = []
-            book.illustration_pages = []
-            book.advertisement_partial_pages = []
-            book.advertisement_full_pages = []
-            book.photograph_pages = []
-            book.sections = []
-            book.plates = []
+            for field in pdf.str_fields:
+                book[field] = None
+            for field in pdf.bool_fields:
+                book[field] = None
+            for field in pdf.int_fields:
+                book[field] = None
+            for field in pdf.list_fields:
+                book[field] = []
+            for field in pdf.struct_fields:
+                book[field] = []
             book.write()
 
     def test_all_null_struct(self):
         with temp_copy('empty_no_metadata.pdf') as pdf_path:
             book = pdf.Pdf.from_path(pdf_path)
-            book.url = book.date_published = book.publishing_frequency = book.title = book.subtitle = book.long_title = book.edition = book.volume = book.in_copyright = book.printing_number = book.numbers_offset = book.roman_numbers_offset = None
-            book.authors = []
-            book.editors = []
-            book.translators = []
-            book.copyright_years = []
-            book.publishers = []
-            book.publisher_cities = []
-            book.printers = []
-            book.book_topics = []
-            book.blank_pages = []
-            book.title_pages = []
-            book.publishing_info_pages = []
-            book.front_cover_pages = []
-            book.back_cover_pages = []
-            book.end_paper_pages = []
-            book.printing_info_pages = []
-            book.half_title_pages = []
-            book.frontispiece_pages = []
-            book.illustration_pages = []
-            book.advertisement_partial_pages = []
-            book.advertisement_full_pages = []
-            book.photograph_pages = []
-            book.sections = pdf.Section()
-            book.plates = pdf.Plate()
+            for field in pdf.str_fields:
+                book[field] = None
+            for field in pdf.bool_fields:
+                book[field] = None
+            for field in pdf.int_fields:
+                book[field] = None
+            for field in pdf.list_fields:
+                book[field] = []
+
+            book.sections = [pdf.Section(**{'HeadingPage': 3, 'PageCount': 34})]
+            for field in pdf.section_str_fields:
+                book.sections[0][field] = None
+            for field in pdf.section_int_fields.remove('heading_page'):
+                book.sections[0][field] = None
+            for field in pdf.section_list_fields:
+                book.sections[0][field] = []
+
+            book.graphics = [pdf.Plate(**{'FirstPage': 3, 'PageCount': 34})]
+            for field in pdf.graphic_str_fields:
+                book.graphics[0][field] = None
+            for field in pdf.graphic_int_fields.remove('first_page'):
+                book.graphics[0][field] = None
+            for field in pdf.graphic_list_fields:
+                book.graphics[0][field] = []
+
+            book.page_tags = [pdf.PageTag(**{'kind': 'blank', 'PageCount': 34})]
+            book.page_tags[0].pages = []
+
             book.write()
 
     def test_all_values(self):
-        pass
+        with temp_copy('empty_no_metadata.pdf') as pdf_path:
+            book = pdf.Pdf.from_path(pdf_path)
+            book.url = 'testing.org/testing'
+            book.authors = ['testing', 'testing2']
+            book.editors = ['testing', 'testing2']
+            book.translators = ['testing', 'testing2']
+            book.date_published = '1763-03-14'
+            book.publishing_frequency = 'monthly'
+            book.title = 'testing'
+            book.subtitle = 'testing'
+            book.long_title = 'testingtesting'
+            book.edition = 1
+            book.volume = 1
+            book.in_copyright = False
+            book.publishers = ['testing', 'testing']
+            book.publisher_cities = ['testing', 'testing']
+            book.printers = ['testing', 'testing']
+            book.printing_number = 1
+            book.numbers_offset = 2
+            book.roman_numbers_offset = 3
+            book.has_ligatures = True
+            book.book_topics = ['testing', 'testing']
+
+            book.sections = [pdf.Section(**{'HeadingPage': 3, 'PageCount': 34})]
+            book.sections[0].kind = 'chapter'
+            book.sections[0].kind_in_book = 'chapter'
+            book.sections[0].title = 'Trigonometry'
+            book.sections[0].authors = ['testing', 'testing']
+            book.sections[0].number = 2
+            book.sections[0].number_kind = 'arabic'
+            book.sections[0].for_edition = 2
+            book.sections[0].first_page = 2
+            book.sections[0].last_page = 4
+            book.sections[0].section_topics = ['testing', 'testing']
+
+            book.graphics = [pdf.Plate(**{'FirstPage': 3, 'PageCount': 34})]
+            book.graphics[0].kind = 'plate'
+            book.graphics[0].content = 'map'
+            book.graphics[0].last_page = 4
+            book.graphics[0].color = 'grayscale'
+
+            book.page_tags = [pdf.PageTag(**{'kind': 'blank', 'PageCount': 34})]
+            book.page_tags[0].pages = [2, 3, 4]
+
+            book.write()
