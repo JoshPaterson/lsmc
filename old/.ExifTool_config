@@ -49,6 +49,8 @@
         Struct => {
             Kind => { },
             Pages => { List => 'Bag', Writeable => 'integer' }
+            NullTags => { List => 'Bag' },
+            UncheckedTags => { List => 'Bag' },
         }
     }
 
@@ -61,6 +63,8 @@
             FirstPage => { Writeable => 'integer' },
             LastPage => { Writeable => 'integer' },
             Color => { },
+            NullTags => { List => 'Bag' },
+            UncheckedTags => { List => 'Bag' },
         }
     },
 
@@ -79,6 +83,8 @@
             FirstPage => { Writeable => 'integer' },
             LastPage => { Writeable => 'integer' },
             SectionTopics => { List => 'Bag' },
+            NullTags => { List => 'Bag' },
+            UncheckedTags => { List => 'Bag' },
         },
     },
 

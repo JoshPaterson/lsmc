@@ -33,11 +33,16 @@ list_fields_alias = {to_camel(i) for i in list_fields}
 struct_fields = {'sections', 'graphics', 'page_tags'}
 
 section_str_fields = {'kind', 'kind_in_book', 'title', 'number_kind'}
+section_str_fields_alias = {to_camel(i) for i in section_str_fields}
 section_int_fields = {'for_edition', 'first_page', 'last_page', 'heading_page', 'number'}
+section_int_fields_alias = {to_camel(i) for i in section_int_fields}
 section_list_fields = {'authors', 'section_topics'}
+section_list_fields_alias = {to_camel(i) for i in section_list_fields}
 
 graphic_str_fields = {'kind', 'content', 'color'}
+graphic_str_fields_alias = {to_camel(i) for i in graphic_str_fields}
 graphic_int_fields = {'first_page', 'last_page'}
+graphic_int_fields_alias = {to_camel(i) for i in graphic_int_fields}
 
 class Unchecked(BaseModel):
     def __bool__(self):
@@ -315,6 +320,21 @@ class Pdf(BaseModel):
             elif (field in out_dict) & (out_dict[field] == UNCHECKED):
                 unchecked_tags.append(field)
                 del out_dict[field]
+
+        for section in out_dict.get('Sections', []):
+            section['NullTags'] = []
+            section['UncheckedTags'] = []
+            for field in section_int_fields_alias | section_str_fields_alias | section_list_fields_alias:
+                if field in section:
+                    if section[field] in [None, []]:
+                        section['NullTags'].append(field)
+                    if section[field] == UNCHECKED:
+                        section['UncheckedTags'].append(field)
+
+        for graphic in out_dict.get('Graphic', []):
+            graphic['NullTags'] = []
+            if 'Pages' in graphic & graphic[field] is None:
+                graphic['NullTags'].append(field)
 
         if null_tags:
             out_dict['NullTags'] = null_tags
