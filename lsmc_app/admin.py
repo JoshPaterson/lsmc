@@ -5,9 +5,15 @@ from .models import City, Book, Topic, CopyrightYear, Page, Section, Author, Edi
 class CityAdmin(admin.ModelAdmin):
     pass
 
+class PageInline(admin.TabularInline):
+    model = Page
+
+class SectionInline(admin.TabularInline):
+    model = Section
+
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
-    pass
+    inline = [PageInline, SectionInline]
 
 @admin.register(Topic)
 class TopicAdmin(admin.ModelAdmin):
