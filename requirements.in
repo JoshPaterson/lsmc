@@ -1,3 +1,5 @@
 django
 django-environ
 pikepdf
+pytesseract
+django-treenode

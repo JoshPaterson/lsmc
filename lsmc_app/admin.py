@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import City, Book, Topic, CopyrightYear, Page, Section, Author, Editor, Translator, Publisher, Printer, PageKind, Graphic
+from treenode.admin import TreeNodeModelAdmin
+from treenode.forms import TreeNodeForm
+from .models import City, Book, Topic, CopyrightYear, Page, Section, Creator, Publisher, Printer, PageKind, Graphic
 
 @admin.register(City)
 class CityAdmin(admin.ModelAdmin):
@@ -16,8 +18,9 @@ class BookAdmin(admin.ModelAdmin):
     inline = [PageInline, SectionInline]
 
 @admin.register(Topic)
-class TopicAdmin(admin.ModelAdmin):
-    pass
+class TopicAdmin(TreeNodeModelAdmin):
+    tree_node_display_mode = TreeNodeModelAdmin.TREENODE_DISPLAY_MODE_ACCORDION
+    form = TreeNodeForm
 
 @admin.register(CopyrightYear)
 class CopyrightYearAdmin(admin.ModelAdmin):
@@ -31,16 +34,8 @@ class PageAdmin(admin.ModelAdmin):
 class SectionAdmin(admin.ModelAdmin):
     pass
 
-@admin.register(Author)
+@admin.register(Creator)
 class AuthorAdmin(admin.ModelAdmin):
-    pass
-
-@admin.register(Editor)
-class EditorAdmin(admin.ModelAdmin):
-    pass
-
-@admin.register(Translator)
-class TranslatorAdmin(admin.ModelAdmin):
     pass
 
 @admin.register(Publisher)

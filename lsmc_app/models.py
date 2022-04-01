@@ -1,4 +1,5 @@
 from django.db import models
+from treenode.models import TreeNodeModel
 
 class City(models.Model):
     name = models.CharField(max_length=31)
@@ -9,10 +10,14 @@ class City(models.Model):
     class Meta:
         verbose_name_plural = 'cities'
 
+    def __str__(self):
+        return self.name
 
-class Topic(models.Model):
+
+class Topic(TreeNodeModel):
     name = models.CharField(max_length=31)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='children')
+    treenode_display_field = 'name'
+    # parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='children')
     # books (MtM)
     # sections (MtM)
     # pages (MtM)
@@ -20,29 +25,19 @@ class Topic(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.name
 
-class Author(models.Model):
+
+class Creator(models.Model):
     # books (MtM)
     # sections (MtM)
     name = models.CharField(max_length=63)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-
-class Editor(models.Model):
-    # books (MtM)
-    # sections (MtM)
-    name = models.CharField(max_length=63)
-    updated_at = models.DateTimeField(auto_now=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-
-class Translator(models.Model):
-    # books (MtM)
-    # sections (MtM)
-    name = models.CharField(max_length=63)
-    updated_at = models.DateTimeField(auto_now=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.name
 
 
 class Publisher(models.Model):
@@ -51,12 +46,18 @@ class Publisher(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Printer(models.Model):
     # books (MtM)
     name = models.CharField(max_length=63)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
 
 
 class CopyrightYear(models.Model):
@@ -65,10 +66,13 @@ class CopyrightYear(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.year
+
 
 class Page(models.Model):
     book = models.ForeignKey('Book', on_delete=models.CASCADE, related_name='pages')
-    page_number = models.PositiveIntegerField()
+    number = models.PositiveIntegerField()
     topics = models.ManyToManyField(Topic)
     image = models.ImageField(upload_to='pages')
     graphics = models.ManyToManyField('Graphic')
@@ -82,7 +86,7 @@ class Page(models.Model):
         return f'{str(self.book)}: pg.{self.page_number}'
 
     class Meta:
-        ordering = ['page_number']
+        ordering = ['number']
 
 
 class Section(models.Model):
@@ -103,32 +107,40 @@ class Section(models.Model):
         TABLE_OF_CONTENTS = 'TOC'
         BIBLIOGRAPHY = 'BIB'
         GLOSSARY = 'GLO'
-        APPENDICES = 'APG'
+        APPENDICES = 'APS'
         APPENDIX = 'APP'
         INDEX = 'IND'
+        PUBLISHERS_CATALOG = 'CAT'
+        TABLE = 'TAB'
+        TABLES = 'TAS'
+        ARTICLE = 'ART'
+        FIGURE = 'FIG'
+        PLATES = 'PLA'
 
     book = models.ForeignKey('Book', on_delete=models.CASCADE, related_name='sections')
-    kind = models.CharField(max_length=3, choices=Kind.choices)
-    kind_checked = models.BooleanField()
-    kind_in_book = models.CharField(max_length=15)
-    kind_in_book_checked = models.BooleanField()
-    title = models.CharField(max_length=100)
-    title_checked = models.BooleanField()
-    number = models.PositiveIntegerField()
-    number_checked = models.BooleanField()
-    number_kind = models.CharField(max_length=1, choices=NumberKind.choices)
-    number_kind_checked = models.BooleanField()
-    for_edition = models.PositiveIntegerField()
-    for_edition_checked = models.BooleanField()
+    kind = models.CharField(max_length=3, choices=Kind.choices, blank=True)
+    kind_checked = models.BooleanField(default=False)
+    kind_in_book = models.CharField(max_length=15, blank=True)
+    kind_in_book_checked = models.BooleanField(default=False)
+    title = models.CharField(max_length=100, blank=True)
+    title_checked = models.BooleanField(default=False)
+    number = models.PositiveIntegerField(null=True)
+    number_checked = models.BooleanField(default=False)
+    number_kind = models.CharField(max_length=1, choices=NumberKind.choices, blank=True)
+    number_kind_checked = models.BooleanField(default=False)
+    caption = models.TextField(blank=True)
+    caption_checked = models.BooleanField(default=False)
+    for_edition = models.PositiveIntegerField(null=True)
+    for_edition_checked = models.BooleanField(default=False)
     heading_page = models.ForeignKey(Page, on_delete=models.RESTRICT, related_name='section_headings')
-    heading_page_checked = models.BooleanField()
     pages = models.ManyToManyField(Page)
-    pagesunchecked = models.BooleanField()
+    pages_checked = models.BooleanField(default=False)
     topics = models.ManyToManyField(Topic)
-    topics_checked = models.BooleanField()
-    authors = models.ManyToManyField(Author)
-    editors = models.ManyToManyField(Editor)
-    translators = models.ManyToManyField(Translator)
+    topics_checked = models.BooleanField(default=False)
+    authors = models.ManyToManyField(Creator, related_name='authored_sections')
+    editors = models.ManyToManyField(Creator, related_name='edited_sections')
+    translators = models.ManyToManyField(Creator, related_name='translated_sections')
+    creators_checked = models.BooleanField(default=False)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -160,54 +172,54 @@ class Book(models.Model):
         DAILY = 'D'
 
     pdf = models.FileField(upload_to='pdf')
-    document_id = models.CharField(max_length=50)
-    instance_id = models.CharField(max_length=50)
-    url = models.URLField()
-    date_published = models.DateField()
-    date_published_checked = models.BooleanField()
-    publishing_frequency = models.CharField(max_length=1, choices=PublishingFrequency.choices)
-    publishing_frequency_checked = models.BooleanField()
-    scan_color = models.CharField(max_length=3, choices=Color.choices)
-    scan_color_checked = models.BooleanField()
-    title = models.CharField(max_length=100)
-    title_checked = models.BooleanField()
-    subtitle = models.CharField(max_length=100)
-    subtitle_checked = models.BooleanField()
-    edition = models.PositiveIntegerField()
-    edition_checked = models.BooleanField()
-    volume = models.PositiveIntegerField()
-    volume_checked = models.BooleanField()
-    volume_number_kind = models.PositiveIntegerField()
-    volume_number_kind = models.BooleanField()
-    printing_number = models.PositiveIntegerField()
-    printing_number_checked = models.BooleanField()
-    numbers_offset = models.PositiveIntegerField()
-    numbers_offset_checked = models.BooleanField()
-    roman_numbers_offset = models.PositiveIntegerField()
-    roman_numbers_offset_checked = models.BooleanField()
-    in_copyright = models.BooleanField()
-    in_copyright_checked = models.BooleanField()
-    has_ligatures = models.BooleanField()
-    has_ligatures_checked = models.BooleanField()
+    document_id = models.UUIDField(max_length=50, null=True)
+    url = models.URLField(blank=True)
+    downloaded_at = models.DateField(null=True)
+    date_published = models.DateField(null=True)
+    date_published_checked = models.BooleanField(default=False)
+    publishing_frequency = models.CharField(max_length=1, choices=PublishingFrequency.choices, blank=True)
+    publishing_frequency_checked = models.BooleanField(default=False)
+    scan_color = models.CharField(max_length=3, choices=Color.choices, blank=True)
+    scan_color_checked = models.BooleanField(default=False)
+    title = models.CharField(max_length=100, blank=True)
+    title_checked = models.BooleanField(default=False)
+    subtitle = models.CharField(max_length=100, blank=False)
+    subtitle_checked = models.BooleanField(default=False)
+    edition = models.PositiveIntegerField(null=True)
+    edition_checked = models.BooleanField(default=False)
+    volume = models.PositiveIntegerField(null=True)
+    volume_checked = models.BooleanField(default=False)
+    volume_number = models.PositiveIntegerField(null=True)
+    volume_number_checked = models.BooleanField(default=False)
+    volume_number_kind = models.CharField(max_length=1, choices=NumberKind.choices, blank=True)
+    volume_number_kind_checked = models.BooleanField(default=False)
+    printing_number = models.PositiveIntegerField(null=True)
+    printing_number_checked = models.BooleanField(default=False)
+    numbers_offset = models.PositiveIntegerField(null=True)
+    numbers_offset_checked = models.BooleanField(default=False)
+    roman_numbers_offset = models.PositiveIntegerField(null=True)
+    roman_numbers_offset_checked = models.BooleanField(default=False)
+    in_copyright = models.BooleanField(null=True)
+    in_copyright_checked = models.BooleanField(default=False)
+    has_ligatures = models.BooleanField(null=True)
+    has_ligatures_checked = models.BooleanField(default=False)
     cities = models.ManyToManyField(City)
-    cities_checked = models.BooleanField()
+    cities_checked = models.BooleanField(default=False)
     topics = models.ManyToManyField(Topic)
-    topics_checked = models.BooleanField()
-    books = models.ManyToManyField(Author)
-    authors_checked = models.BooleanField()
-    editors = models.ManyToManyField(Editor)
-    editors_checked = models.BooleanField()
-    translators = models.ManyToManyField(Translator)
-    translators_checked = models.BooleanField()
+    topics_checked = models.BooleanField(default=False)
+    authors = models.ManyToManyField(Creator, related_name='authored_books')
+    editors = models.ManyToManyField(Creator, related_name='edited_books')
+    translators = models.ManyToManyField(Creator, related_name='translated_books')
+    creators_checked = models.BooleanField(default=False)
     printers = models.ManyToManyField(Printer)
-    printers_checked = models.BooleanField()
+    printers_checked = models.BooleanField(default=False)
     publishers = models.ManyToManyField(Publisher)
-    publishers_checked = models.BooleanField()
+    publishers_checked = models.BooleanField(default=False)
     copyright_years = models.ManyToManyField(CopyrightYear)
-    copyright_years_checked = models.BooleanField()
+    copyright_years_checked = models.BooleanField(default=False)
     # pages (OtM)
     # sections (OtM)
-    sections_checked = models.BooleanField()
+    sections_checked = models.BooleanField(default=False)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -218,8 +230,6 @@ class Book(models.Model):
         return f'{self.title} Vol. {self.volume}'
 
     class Meta:
-        # ordering = ['date_published',]
-        # unique_together = [['','']]
         pass
 
 
@@ -237,11 +247,18 @@ class PageKind(models.Model):
         FRONT_JACKET_FLAP = 'FJF'
         BACK_JACKET_FLAP = 'BJF'
         DECORATIVE_PAPER = 'DEC'
+        FULL_AD = 'FAD'
+        PARTIAL_AD = 'PAD'
+        EQUATIONS = 'EQS'
+        GRAPHICS = 'GRA'
 
     page = models.ForeignKey(Page, on_delete=models.CASCADE, related_name='kinds')
     name = models.CharField(max_length=3, choices=Kind.choices)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Graphic(models.Model):
@@ -256,6 +273,8 @@ class Graphic(models.Model):
         DIAGRAM = 'DIA'
         ILLUSTRATION = 'ILL'
         TECHNICAL_DRAWING = 'TEC'
+        DRAWING = 'DRA'
+        DECORATION = 'DEC'
 
     class Color(models.TextChoices):
         COLOR = 'COL'
@@ -263,14 +282,17 @@ class Graphic(models.Model):
         GRAYSCALE = 'GRA'
 
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='graphics')
-    medium = models.CharField(max_length=3, choices=Medium.choices)
-    medium_checked = models.BooleanField()
-    content = models.CharField(max_length=3, choices=Content.choices)
-    content_checked = models.BooleanField()
-    print_color = models.CharField(max_length=3, choices=Color.choices)
-    print_color_checked = models.BooleanField()
+    medium = models.CharField(max_length=3, choices=Medium.choices, blank=True)
+    medium_checked = models.BooleanField(default=False)
+    content = models.CharField(max_length=3, choices=Content.choices, blank=True)
+    content_checked = models.BooleanField(default=False)
+    print_color = models.CharField(max_length=3, choices=Color.choices, blank=True)
+    print_color_checked = models.BooleanField(default=False)
     # pages (MtM)
-    pages_checked = models.BooleanField()
+    pages_checked = models.BooleanField(default=False)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
-# Create your models here.
+    artist = models.ManyToManyField(Creator)
+
+    def __str__(self):
+        return f'{self.kind} on pg. {self.pages[0].number} of {self.book}'
