@@ -6,12 +6,27 @@
 #
 asgiref==3.5.0
     # via django
+certifi==2021.10.8
+    # via requests
+charset-normalizer==2.0.12
+    # via requests
 django==4.0.3
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   django-extensions
+    #   django-htmx
 django-environ==0.8.1
+    # via -r requirements.in
+django-extensions==3.1.5
+    # via -r requirements.in
+django-htmx==1.9.0
     # via -r requirements.in
 django-treenode==0.18.1
     # via -r requirements.in
+hunspell==0.5.5
+    # via -r requirements.in
+idna==3.3
+    # via requests
 lxml==4.8.0
     # via pikepdf
 packaging==21.3
@@ -28,7 +43,11 @@ pyparsing==3.0.7
     # via packaging
 pytesseract==0.3.9
     # via -r requirements.in
+requests==2.27.1
+    # via -r requirements.in
 six==1.16.0
     # via django-treenode
 sqlparse==0.4.2
     # via django
+urllib3==1.26.9
+    # via requests

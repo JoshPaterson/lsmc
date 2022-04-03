@@ -3,3 +3,7 @@ django-environ
 pikepdf
 pytesseract
 django-treenode
+django-htmx
+hunspell
+django-extensions
+requests
