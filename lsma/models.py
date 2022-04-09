@@ -4,6 +4,8 @@ from treenode.models import TreeNodeModel
 from django.utils.html import mark_safe
 from django.contrib.postgres.fields import ArrayField
 from django_extensions.db.models import TimeStampedModel
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill
 
 
 class NumberKind(models.TextChoices):
@@ -95,6 +97,10 @@ class Page(TimeStampedModel):
     topics = models.ManyToManyField(Topic, blank=True)
     original_image = models.ImageField(unique=True)
     jpg_image = models.ImageField(unique=True)
+    thumbnail = ImageSpecField(source='original_image',
+                               processors=[ResizeToFill(100,50)],
+                               format='JPEG',
+                               options={'quality': 60})
     graphics = models.ManyToManyField('graphic', blank=True)
     text = models.TextField(blank=True, null=True)
     text_generated_at = models.DateTimeField(blank=True, null=True)
@@ -112,7 +118,7 @@ class Page(TimeStampedModel):
         return mark_safe(f'<img src="{self.jpg_image.url}" width="800"/>')
 
     def image_tag_small(self):
-        return mark_safe(f'<img src="{self.jpg_image.url}" height="20"/>')
+        return mark_safe(f'<img src="{self.thumbnail.url}" height="20"/>')
 
     class Meta:
         ordering = ['number']
@@ -261,10 +267,6 @@ class Book(TimeStampedModel):
         else:
             return str(self.uuid)
 
-    def get_first_person(self):
-        persons = [a.last_name for a in self.authors] + [e.last_name for e in self.editors] + [t.last_name for t in self.translators] + ''
-        return persons[0]
-
     def make_slug(self):
         slug = str(self.date_published.year)
         if person:=self.contributions[0].family_name:
@@ -279,7 +281,7 @@ class Book(TimeStampedModel):
             title = full_title + self.title
         if self.volume_number:
             full_title = full_title + f' vol. {self.volume_number}'
-        if self.edition:
+        if self.edition_number:
             full_title = full_title + f' ed. {self.edition_number}'
         if self.issue_number:
             full_title = full_title + f' is. {self.issue_number}'
