@@ -4,8 +4,10 @@ from treenode.models import TreeNodeModel
 from django.utils.html import mark_safe
 from django.contrib.postgres.fields import ArrayField
 from django_extensions.db.models import TimeStampedModel
+from imagekit import ImageSpec, register
 from imagekit.models import ImageSpecField
-from imagekit.processors import Thumbnail
+from imagekit.processors import Thumbnail, Crop
+from imagekit.utils import get_field_info
 
 
 class NumberKind(models.TextChoices):
@@ -99,10 +101,10 @@ class Page(TimeStampedModel):
     thumbnail = ImageSpecField(source='original_image',
                                processors=[Thumbnail(height=200)],
                                format='JPEG',
-                               options={'quality': 60})
+                               options={'quality': 50})
     jpg_image = ImageSpecField(source='original_image',
                                 format='JPEG',
-                                options={'quality': 80})
+                                options={'quality': 50})
     graphics = models.ManyToManyField('graphic', blank=True)
     text = models.TextField(blank=True, null=True)
     text_generated_at = models.DateTimeField(blank=True, null=True)
@@ -364,6 +366,7 @@ class Box(TimeStampedModel):
         PARAGRAPH = 3
         LINE = 4
         WORD = 5
+
     page = models.ForeignKey(Page, on_delete=models.CASCADE, blank=True)
     original_text = models.CharField(max_length=32, blank=True, editable=False)
     text = models.CharField(max_length=32, blank=True)
@@ -386,20 +389,16 @@ class Box(TimeStampedModel):
         return f'{self.page_number}:{self.block_number}:{self.paragraph_number}:{self.line_number}:{self.word_number}:{self.text}'
 
     def image_tag(self):
-        return mark_safe(f'<img src="boxes/{str(self.page.book.slug)}/{self.page.number}/{self.level}/{self.page_number}/{self.block_number}/{self.paragraph_number}/{self.line_number}/{self.word_number}" />')
+        image_height = self.page.jpg_image.height_field
+        image_width = self.page.jpg_image.width_field
+        top_percent = self.top / image_height
+        left_percent = self.left / image_width
+        height_percent = self.height / image_height
+        return mark_safe(f'<div style="overflow:hidden;height:{self.height}px;width:{self.width}px;"><img src="{self.page.jpg_image.url}" style="margin-top:-{self.top}px;margin-left:-{self.left}px"/></div>')
 
     def get_absolute_url(self):
-        if self.level == self.Level.PAGE:
-            number = self.page_number
-        if self.level == self.Level.BLOCK:
-            number = self.block_number
-        if self.level == self.Level.PARAGRAPH:
-            number = self.paragraph_number
-        if self.level == self.Level.LINE:
-            number = self.line_number
-        if self.level == self.Level.WORD:
-            number = self.word_number
-        return f'{self.page.get_absolute_url()}/{self.level}/{number}'
+        return f'{self.page.get_absolute_url()}/box/{self.id}'
+
 
 
 class Table(TimeStampedModel):
