@@ -7,3 +7,4 @@ django-htmx
 hunspell
 django-extensions
 requests
+psycopg2

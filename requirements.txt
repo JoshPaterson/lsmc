@@ -39,6 +39,8 @@ pillow==9.0.1
     # via
     #   pikepdf
     #   pytesseract
+psycopg2==2.9.3
+    # via -r requirements.in
 pyparsing==3.0.7
     # via packaging
 pytesseract==0.3.9
