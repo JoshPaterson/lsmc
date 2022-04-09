@@ -64,7 +64,7 @@ class TopicAdmin(TreeNodeModelAdmin):
 
 @admin.register(Page)
 class PageAdmin(admin.ModelAdmin):
-    fields = ('image_tag', 'thumbnail_tag', 'original_image', 'book', 'number', 'topics', 'graphics', 'text', 'text_generated_at', 'kinds', 'image_problems', 'text_direction')
+    fields = ('image_tag', 'thumbnail_tag', 'original_image', 'book', 'number', 'topics', 'graphics', 'text', 'text_generated_at', 'kinds', 'image_problems', 'text_top_rotated_to')
     readonly_fields = ('image_tag', 'thumbnail_tag')
     list_display = ['book', 'number', 'thumbnail_tag']
     list_per_page = 20

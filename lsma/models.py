@@ -428,3 +428,6 @@ class OcrFix(TimeStampedModel):
     new_value = models.CharField(max_length=31, null=True)
     is_correct = models.BooleanField(blank=True, null=True)
     decided_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = 'ocr fixes'
