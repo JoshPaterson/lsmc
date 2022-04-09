@@ -5,7 +5,7 @@ from django.utils.html import mark_safe
 from django.contrib.postgres.fields import ArrayField
 from django_extensions.db.models import TimeStampedModel
 from imagekit.models import ImageSpecField
-from imagekit.processors import ResizeToFill
+from imagekit.processors import Thumbnail
 
 
 class NumberKind(models.TextChoices):
@@ -96,11 +96,13 @@ class Page(TimeStampedModel):
     number = models.PositiveSmallIntegerField(blank=True, null=True)
     topics = models.ManyToManyField(Topic, blank=True)
     original_image = models.ImageField(unique=True)
-    jpg_image = models.ImageField(unique=True)
     thumbnail = ImageSpecField(source='original_image',
-                               processors=[ResizeToFill(100,50)],
+                               processors=[Thumbnail(height=200)],
                                format='JPEG',
                                options={'quality': 60})
+    jpg_image = ImageSpecField(source='original_image',
+                                format='JPEG',
+                                options={'quality': 80})
     graphics = models.ManyToManyField('graphic', blank=True)
     text = models.TextField(blank=True, null=True)
     text_generated_at = models.DateTimeField(blank=True, null=True)
@@ -109,7 +111,7 @@ class Page(TimeStampedModel):
     # tables (MtM)
     kinds = ArrayField(models.CharField(max_length=3, choices=Kind.choices), null=True, blank=True)
     image_problems = ArrayField(models.CharField(max_length=3, choices=ImageProblem.choices), null=True, blank=True)
-    text_direction = models.CharField(max_length=1, blank=True, null=True, choices=Direction.choices)
+    text_top_rotated_to = models.CharField(max_length=1, blank=True, null=True, choices=Direction.choices)
 
     def __str__(self):
         return f'pg. {self.number}'
@@ -117,8 +119,8 @@ class Page(TimeStampedModel):
     def image_tag(self):
         return mark_safe(f'<img src="{self.jpg_image.url}" width="800"/>')
 
-    def image_tag_small(self):
-        return mark_safe(f'<img src="{self.thumbnail.url}" height="20"/>')
+    def thumbnail_tag(self):
+        return mark_safe(f'<img src="{self.thumbnail.url}" />')
 
     class Meta:
         ordering = ['number']
