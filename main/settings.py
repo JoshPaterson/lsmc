@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'lsma',
-    'treenode'
+    'treenode',
+    'imagekit'
 ]
 
 MIDDLEWARE = [

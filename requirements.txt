@@ -13,13 +13,18 @@ charset-normalizer==2.0.12
 django==4.0.3
     # via
     #   -r requirements.in
+    #   django-appconf
     #   django-extensions
     #   django-htmx
+django-appconf==1.0.5
+    # via django-imagekit
 django-environ==0.8.1
     # via -r requirements.in
 django-extensions==3.1.5
     # via -r requirements.in
 django-htmx==1.9.0
+    # via -r requirements.in
+django-imagekit==4.1.0
     # via -r requirements.in
 django-treenode==0.18.1
     # via -r requirements.in
@@ -35,6 +40,8 @@ packaging==21.3
     #   pytesseract
 pikepdf==5.1.1
     # via -r requirements.in
+pilkit==2.0
+    # via django-imagekit
 pillow==9.0.1
     # via
     #   pikepdf
@@ -48,7 +55,9 @@ pytesseract==0.3.9
 requests==2.27.1
     # via -r requirements.in
 six==1.16.0
-    # via django-treenode
+    # via
+    #   django-imagekit
+    #   django-treenode
 sqlparse==0.4.2
     # via django
 urllib3==1.26.9
