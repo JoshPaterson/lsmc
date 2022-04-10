@@ -97,7 +97,7 @@ class Page(TimeStampedModel):
     book = models.ForeignKey('Book', on_delete=models.CASCADE, related_name='pages')
     number = models.PositiveSmallIntegerField(blank=True, null=True)
     topics = models.ManyToManyField(Topic, blank=True)
-    original_image = models.ImageField(unique=True)
+    original_image = models.ImageField(unique=True, width_field='width', height_field='height')
     thumbnail = ImageSpecField(source='original_image',
                                processors=[Thumbnail(height=200)],
                                format='JPEG',
@@ -105,6 +105,8 @@ class Page(TimeStampedModel):
     jpg_image = ImageSpecField(source='original_image',
                                 format='JPEG',
                                 options={'quality': 50})
+    height = models.PositiveSmallIntegerField(blank=True, null=True)
+    width = models.PositiveSmallIntegerField(blank=True, null=True)
     graphics = models.ManyToManyField('graphic', blank=True)
     text = models.TextField(blank=True, null=True)
     text_generated_at = models.DateTimeField(blank=True, null=True)
@@ -381,6 +383,8 @@ class Box(TimeStampedModel):
     width = models.PositiveSmallIntegerField()
     height = models.PositiveSmallIntegerField()
     original_confidence = models.FloatField(blank=True, null=True, editable=False)
+    confirmed_at = models.DateTimeField(blank=True, null=True)
+
 
     class Meta:
         verbose_name_plural = 'boxes'
@@ -389,12 +393,9 @@ class Box(TimeStampedModel):
         return f'{self.page_number}:{self.block_number}:{self.paragraph_number}:{self.line_number}:{self.word_number}:{self.text}'
 
     def image_tag(self):
-        image_height = self.page.jpg_image.height_field
-        image_width = self.page.jpg_image.width_field
-        top_percent = self.top / image_height
-        left_percent = self.left / image_width
-        height_percent = self.height / image_height
-        return mark_safe(f'<div style="overflow:hidden;height:{self.height}px;width:{self.width}px;"><img src="{self.page.jpg_image.url}" style="margin-top:-{self.top}px;margin-left:-{self.left}px"/></div>')
+        desired_height = 50
+        scale = desired_height / self.height
+        return mark_safe(f'<div style="overflow:hidden;width:{self.width*scale}px;height:{self.height*scale}px;"><img src="{self.page.jpg_image.url}" style="margin-top:-{self.top*scale}px;margin-left:-{self.left*scale}px;transform:scale({scale});transform-origin:0px 0px;"/></div>')
 
     def get_absolute_url(self):
         return f'{self.page.get_absolute_url()}/box/{self.id}'

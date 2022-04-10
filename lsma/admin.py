@@ -80,7 +80,7 @@ class AuthorAdmin(admin.ModelAdmin):
 @admin.register(Box)
 class BoxAdmin(admin.ModelAdmin):
     fields = ('page', 'original_text',  'image_tag', 'text', 'page_number', 'block_number', 'paragraph_number', 'line_number', 'word_number', 'level', 'left', 'top', 'width', 'height', 'original_confidence')
-    list_display = ('image_tag', 'text', 'original_confidence', 'page_number', 'block_number', 'paragraph_number', 'line_number', 'word_number', 'level')
+    list_display = ('level', 'image_tag', 'text', 'original_confidence')
     readonly_fields = ('image_tag', 'page', 'original_text', 'original_confidence')
     list_filter = ['level']
     search_field = ['text', 'original_text']
