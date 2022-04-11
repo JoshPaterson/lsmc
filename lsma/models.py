@@ -393,7 +393,16 @@ class Box(TimeStampedModel):
         return f'{self.page_number}:{self.block_number}:{self.paragraph_number}:{self.line_number}:{self.word_number}:{self.text}'
 
     def image_tag(self):
-        desired_height = 50
+        if self.level == self.Level.WORD:
+            desired_height = 50
+        elif self.level == self.Level.LINE:
+            desired_height = 100
+        elif self.level == self.Level.PARAGRAPH:
+            desired_height = 100
+        elif self.level == self.Level.BLOCK:
+            desired_height = 100
+        elif self.level == self.Level.PAGE:
+            desired_height = 100
         scale = desired_height / self.height
         return mark_safe(f'<div style="overflow:hidden;width:{self.width*scale}px;height:{self.height*scale}px;"><img src="{self.page.jpg_image.url}" style="margin-top:-{self.top*scale}px;margin-left:-{self.left*scale}px;transform:scale({scale});transform-origin:0px 0px;"/></div>')
 
