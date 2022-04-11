@@ -370,6 +370,8 @@ class Box(TimeStampedModel):
         WORD = 5
 
     page = models.ForeignKey(Page, on_delete=models.CASCADE, blank=True)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='children')
+    order = models.PositiveIntegerField()
     original_text = models.CharField(max_length=32, blank=True, editable=False)
     text = models.CharField(max_length=32, blank=True)
     level = models.PositiveSmallIntegerField(choices=Level.choices)

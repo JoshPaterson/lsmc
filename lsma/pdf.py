@@ -113,9 +113,12 @@ def add_book(pdf_path):
         page = Page.objects.create(book=book, original_image=str(original_image), number=int(original_image.stem))
         print('added ', page)
         box_lists = get_boxes(original_image)
-        Box.objects.bulk_create(
-            [Box(
+        for i, box_list in enumerate(box_lists, start=1):
+            box_list.append(i)
+
+        page_lists = [Box(
             page=page,
+            order=i,
             level=box_list[0],
             page_number=box_list[1],
             block_number=box_list[2],
@@ -129,8 +132,88 @@ def add_book(pdf_path):
             original_confidence=box_list[10],
             text=box_list[11],
             original_text=box_list[11],
-            ) for box_list in box_lists]
-        )
+            ) for box_list in box_lists if box_list[0]=='1']
+        Box.objects.bulk_create(page_lists)
+
+        block_lists = [Box(
+            page=page,
+            parent=page_lists[int(box_list[1])-1],
+            order=i,
+            level=box_list[0],
+            page_number=box_list[1],
+            block_number=box_list[2],
+            paragraph_number=box_list[3],
+            line_number=box_list[4],
+            word_number=box_list[5],
+            left=box_list[6],
+            top=box_list[7],
+            width=box_list[8],
+            height=box_list[9],
+            original_confidence=box_list[10],
+            text=box_list[11],
+            original_text=box_list[11],
+            ) for box_list in box_lists if box_list[0]=='2']
+        Box.objects.bulk_create(block_lists)
+
+        paragraph_lists = [Box(
+            page=page,
+            parent=block_lists[int(box_list[2])-1],
+            order=i,
+            level=box_list[0],
+            page_number=box_list[1],
+            block_number=box_list[2],
+            paragraph_number=box_list[3],
+            line_number=box_list[4],
+            word_number=box_list[5],
+            left=box_list[6],
+            top=box_list[7],
+            width=box_list[8],
+            height=box_list[9],
+            original_confidence=box_list[10],
+            text=box_list[11],
+            original_text=box_list[11],
+            ) for box_list in box_lists if box_list[0]=='3']
+        Box.objects.bulk_create(paragraph_lists)
+
+        line_lists = [Box(
+            page=page,
+            parent=paragraph_lists[int(box_list[3])-1],
+            order=i,
+            level=box_list[0],
+            page_number=box_list[1],
+            block_number=box_list[2],
+            paragraph_number=box_list[3],
+            line_number=box_list[4],
+            word_number=box_list[5],
+            left=box_list[6],
+            top=box_list[7],
+            width=box_list[8],
+            height=box_list[9],
+            original_confidence=box_list[10],
+            text=box_list[11],
+            original_text=box_list[11],
+            ) for box_list in box_lists if box_list[0]=='4']
+        Box.objects.bulk_create(line_lists)
+
+        word_lists = [Box(
+            page=page,
+            parent=line_lists[int(box_list[4])-1],
+            order=i,
+            level=box_list[0],
+            page_number=box_list[1],
+            block_number=box_list[2],
+            paragraph_number=box_list[3],
+            line_number=box_list[4],
+            word_number=box_list[5],
+            left=box_list[6],
+            top=box_list[7],
+            width=box_list[8],
+            height=box_list[9],
+            original_confidence=box_list[10],
+            text=box_list[11],
+            original_text=box_list[11],
+            ) for box_list in box_lists if box_list[0]=='5']
+        Box.objects.bulk_create(word_lists)
 
 def remove_book(uuid):
     book = Book.objects.get(uuid=str(uuid))
