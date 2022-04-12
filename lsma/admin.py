@@ -22,7 +22,7 @@ class BookAdmin(admin.ModelAdmin):
         ('Title', {
             'fields': (('title', 'title_checked'), ('subtitle', 'subtitle_checked'), ('volume_number','volume_number_checked'), ('volume_number_kind', 'volume_number_kind_checked'), ('issue_number','issue_number_checked'), ('issue_number_kind', 'issue_number_kind_checked'), ('edition_number','edition_number_checked'), ('series_name', 'number_in_series', 'number_in_series_kind', 'series_checked'))
         }),
-        ('Persons', {
+        ('People', {
             'fields': (('contributions', 'contributions_checked'),)
         }),
         ('Title/ Copyright Pages', {

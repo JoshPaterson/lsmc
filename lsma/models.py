@@ -42,6 +42,7 @@ class Person(TimeStampedModel):
 
     class Meta:
         unique_together = ['family_name', 'given_names']
+        verbose_name_plural = 'people'
 
     def get_full_name(self):
         name = self.family_name
