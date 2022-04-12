@@ -8,6 +8,7 @@ from imagekit import ImageSpec, register
 from imagekit.models import ImageSpecField
 from imagekit.processors import Thumbnail, Crop
 from imagekit.utils import get_field_info
+from .text import word_list_to_text
 
 
 class NumberKind(models.TextChoices):
@@ -132,6 +133,28 @@ class Page(TimeStampedModel):
     def get_absolute_url(self):
         return f'{self.book.get_absolute_url()}/page/{self.number}'
 
+    def max_word_height(self):
+        words = self.boxes.filter(level=Box.Level.WORD).order_by('-height')
+        if words:
+            return words[0].height/self.height
+        else:
+            return None
+
+    def median_word_height(self):
+        words = self.boxes.filter(level=Box.Level.WORD).order_by('-height')
+        if words:
+            middle = len(words)//2
+            return words[middle].height/self.height
+        else:
+            return None
+
+    def generate_text(self):
+        word_boxes = self.boxes.filter(level=Box.Level.WORD)
+        word_list = [box.text for box in word_boxes]
+        text = word_list_to_text(word_list)
+        self.text = text
+        self.save()
+
 
 class Section(TimeStampedModel):
     class Kind(models.TextChoices):
@@ -189,6 +212,13 @@ class Section(TimeStampedModel):
 
 
 class Book(TimeStampedModel):
+    class Language(models.TextChoices):
+        FRENCH = "FRE"
+        GERMAN = "GER"
+        LATIN = "LAT"
+        GREEK = "GRE"
+        INDONESIAN = "IND"
+
     class Color(models.TextChoices):
         COLOR = 'COL'
         BITONAL = 'BIT'
@@ -260,7 +290,7 @@ class Book(TimeStampedModel):
     graphics_checked = models.DateTimeField(blank=True, null=True)
     slug = models.SlugField(blank=True, null=True, unique=True)
     hidden = models.BooleanField(blank=True, default=False)
-    other_languages = ArrayField(models.CharField(max_length=15), null=True, blank=True)
+    other_languages = ArrayField(models.CharField(max_length=15, choices=Language.choices), null=True, blank=True)
     other_languages_checked = models.DateTimeField(blank=True, null=True)
     series_name = models.CharField(max_length=63, blank=True, null=True)
     number_in_series = models.PositiveSmallIntegerField(blank=True, null=True)
@@ -369,7 +399,7 @@ class Box(TimeStampedModel):
         LINE = 4
         WORD = 5
 
-    page = models.ForeignKey(Page, on_delete=models.CASCADE, blank=True)
+    page = models.ForeignKey(Page, on_delete=models.CASCADE, blank=True, related_name='boxes')
     parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='children')
     order = models.PositiveIntegerField()
     original_text = models.CharField(max_length=32, blank=True, editable=False)
@@ -390,11 +420,14 @@ class Box(TimeStampedModel):
 
     class Meta:
         verbose_name_plural = 'boxes'
+        ordering = ['order']
 
     def __str__(self):
         return f'{self.page_number}:{self.block_number}:{self.paragraph_number}:{self.line_number}:{self.word_number}:{self.text}'
 
     def image_tag(self):
+        if not self.level:
+            return
         if self.level == self.Level.WORD:
             desired_height = 50
         elif self.level == self.Level.LINE:
@@ -410,6 +443,12 @@ class Box(TimeStampedModel):
 
     def get_absolute_url(self):
         return f'{self.page.get_absolute_url()}/box/{self.id}'
+
+    def save(self, *args, **kwargs):
+        if self.level == Level.WORD:
+            # TODO: test if the word changed before doing this:
+            self.page.generate_text()
+        super(Box, self).save(*args, **kwargs)
 
 
 

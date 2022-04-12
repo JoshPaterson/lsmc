@@ -1,15 +1,10 @@
 from pikepdf import Pdf, PdfImage
 from pikepdf.models.metadata import PdfMetadata
 from lxml import etree
-from uuid import UUID, uuid4
+from uuid import UUID
 import pytesseract
 from PIL import Image
-import hunspell
-dictionary = hunspell.HunSpell('/usr/share/hunspell/en_US.dic', '/usr/share/hunspell/en_US.aff')
-import string
-import re
 from pathlib import Path
-regex = re.compile(f'[{re.escape(string.punctuation)}]')
 from django.db.utils import IntegrityError
 
 import requests
@@ -64,35 +59,6 @@ def get_boxes(image_path: str) -> list[list]:
     data = [line.split('\t') for line in data[1:]]
     return data
 
-def make_word_list(data: list[list]):
-    words = [line[-1].lower() for line in data if line[-1] != '']
-    words_no_hyphen = []
-    skip = False
-    for word in words:
-        if skip:
-            words_no_hyphen[-1] = words_no_hyphen[-1] + word
-            skip = False
-            continue
-        if word[-1] != '-':
-            words_no_hyphen.append(word)
-        else:
-            words_no_hyphen.append(word[:-1])
-            skip = True
-    words = [regex.sub('', word) for word in words_no_hyphen]
-    return [word for word in words if word != '']
-
-
-def fix_long_s(word):
-    if dictionary.spell(word):
-        return word
-    elif dictionary.spell(word.replace('f', 's')):
-        return word.replace('f', 's')
-    else:
-        return word
-
-def clean_words_long_s(words):
-    return [fix_long_s(word) for word in words]
-
 def get_stem(path):
     return int(path.stem)
 
@@ -115,10 +81,12 @@ def add_book(pdf_path):
         box_lists = get_boxes(original_image)
         for i, box_list in enumerate(box_lists, start=1):
             box_list.append(i)
+            if box_list[10] == -1:
+                box_list[10] = None
 
         page_lists = [Box(
             page=page,
-            order=i,
+            order=box_list[12],
             level=box_list[0],
             page_number=box_list[1],
             block_number=box_list[2],
@@ -138,7 +106,7 @@ def add_book(pdf_path):
         block_lists = [Box(
             page=page,
             parent=page_lists[int(box_list[1])-1],
-            order=i,
+            order=box_list[12],
             level=box_list[0],
             page_number=box_list[1],
             block_number=box_list[2],
@@ -158,7 +126,7 @@ def add_book(pdf_path):
         paragraph_lists = [Box(
             page=page,
             parent=block_lists[int(box_list[2])-1],
-            order=i,
+            order=box_list[12],
             level=box_list[0],
             page_number=box_list[1],
             block_number=box_list[2],
@@ -178,7 +146,7 @@ def add_book(pdf_path):
         line_lists = [Box(
             page=page,
             parent=paragraph_lists[int(box_list[3])-1],
-            order=i,
+            order=box_list[12],
             level=box_list[0],
             page_number=box_list[1],
             block_number=box_list[2],
@@ -198,7 +166,7 @@ def add_book(pdf_path):
         word_lists = [Box(
             page=page,
             parent=line_lists[int(box_list[4])-1],
-            order=i,
+            order=box_list[12],
             level=box_list[0],
             page_number=box_list[1],
             block_number=box_list[2],
@@ -214,6 +182,7 @@ def add_book(pdf_path):
             original_text=box_list[11],
             ) for box_list in box_lists if box_list[0]=='5']
         Box.objects.bulk_create(word_lists)
+        page.generate_text()
 
 def remove_book(uuid):
     book = Book.objects.get(uuid=str(uuid))

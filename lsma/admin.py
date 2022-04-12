@@ -64,8 +64,8 @@ class TopicAdmin(TreeNodeModelAdmin):
 
 @admin.register(Page)
 class PageAdmin(admin.ModelAdmin):
-    fields = ('image_tag', 'thumbnail_tag', 'original_image', 'book', 'number', 'topics', 'graphics', 'text', 'text_generated_at', 'kinds', 'image_problems', 'text_top_rotated_to')
-    readonly_fields = ('image_tag', 'thumbnail_tag')
+    fields = ('image_tag', 'thumbnail_tag', 'original_image', 'book', 'number', 'topics', 'graphics', 'text', 'text_generated_at', 'kinds', 'image_problems', 'text_top_rotated_to', 'max_word_height', 'median_word_height')
+    readonly_fields = ('image_tag', 'thumbnail_tag', 'max_word_height', 'median_word_height')
     list_display = ['book', 'number', 'thumbnail_tag']
     list_per_page = 20
 
@@ -77,12 +77,22 @@ class SectionAdmin(admin.ModelAdmin):
 class AuthorAdmin(admin.ModelAdmin):
     pass
 
+
+class BoxInline(admin.TabularInline):
+    model = Box
+    fields = ('image_tag', 'page', 'level', 'order', 'original_text', 'text', '__str__')
+    readonly_fields = ('image_tag', 'page', 'level', 'order', 'original_text', 'text', '__str__')
+    extra = 0
+    show_change_link = True
+    view_on_site = False
+
 @admin.register(Box)
 class BoxAdmin(admin.ModelAdmin):
-    fields = ('page', 'original_text',  'image_tag', 'text', 'parent', 'page_number', 'block_number', 'paragraph_number', 'line_number', 'word_number', 'level', 'left', 'top', 'width', 'height', 'original_confidence')
+    fields = ('page', 'original_text',  'image_tag', 'text', 'parent', 'page_number', 'block_number', 'paragraph_number', 'line_number', 'word_number', 'level', 'left', 'top', 'width', 'height', 'original_confidence', 'order')
     list_display = ('level', 'image_tag', 'text', 'original_confidence')
-    readonly_fields = ('image_tag', 'page', 'original_text', 'original_confidence', 'parent')
+    readonly_fields = ('image_tag', 'page', 'original_text', 'original_confidence', 'parent', 'page_number', 'block_number', 'paragraph_number', 'line_number', 'word_number', 'level', 'left', 'top', 'width', 'height', 'order')
     list_filter = ['level']
     search_field = ['text', 'original_text']
     empty_value_display = "<empty>"
     list_per_page = 30
+    inlines = (BoxInline,)
