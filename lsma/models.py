@@ -97,7 +97,7 @@ class Page(TimeStampedModel):
 
     book = models.ForeignKey('Book', on_delete=models.CASCADE, related_name='pages')
     number = models.PositiveSmallIntegerField(blank=True, null=True)
-    topics = models.ManyToManyField(Topic, blank=True)
+    topics = models.ManyToManyField(Topic, blank=True, related_name='pages')
     original_image = models.ImageField(unique=True, width_field='width', height_field='height')
     thumbnail = ImageSpecField(source='original_image',
                                processors=[Thumbnail(height=200)],
@@ -108,7 +108,7 @@ class Page(TimeStampedModel):
                                 options={'quality': 50})
     height = models.PositiveSmallIntegerField(blank=True, null=True)
     width = models.PositiveSmallIntegerField(blank=True, null=True)
-    graphics = models.ManyToManyField('graphic', blank=True)
+    graphics = models.ManyToManyField('graphic', blank=True, related_name='pages')
     text = models.TextField(blank=True, null=True)
     text_generated_at = models.DateTimeField(blank=True, null=True)
     # sections (MtM)
@@ -190,12 +190,12 @@ class Section(TimeStampedModel):
     for_edition = models.PositiveSmallIntegerField(null=True, blank=True)
     for_edition_checked = models.DateTimeField(blank=True, null=True)
     heading_page = models.ForeignKey(Page, on_delete=models.RESTRICT, related_name='section_headings')
-    pages = models.ManyToManyField(Page, blank=True)
+    pages = models.ManyToManyField(Page, blank=True, related_name='sections')
     first_page_checked = models.DateTimeField(blank=True, null=True)
     last_page_checked = models.DateTimeField(blank=True, null=True)
-    topics = models.ManyToManyField(Topic, blank=True)
+    topics = models.ManyToManyField(Topic, blank=True, related_name='sections')
     topics_checked = models.DateTimeField(blank=True, null=True)
-    contributions = models.ManyToManyField(Contribution, blank=True)
+    contributions = models.ManyToManyField(Contribution, blank=True, related_name='sections')
     contributions_checked = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
@@ -273,9 +273,9 @@ class Book(TimeStampedModel):
     has_ligatures_checked = models.DateTimeField(blank=True, null=True)
     cities = ArrayField(models.CharField(max_length=15), null=True, blank=True)
     cities_checked = models.DateTimeField(blank=True, null=True)
-    topics = models.ManyToManyField(Topic, blank=True)
+    topics = models.ManyToManyField(Topic, blank=True, related_name='books')
     topics_checked = models.DateTimeField(blank=True, null=True)
-    contributions = models.ManyToManyField(Contribution, blank=True)
+    contributions = models.ManyToManyField(Contribution, blank=True, related_name='books')
     contributions_checked = models.DateTimeField(blank=True, null=True)
     printers = ArrayField(models.CharField(max_length=15), null=True, blank=True)
     printers_checked = models.DateTimeField(blank=True, null=True)
@@ -371,7 +371,7 @@ class Graphic(TimeStampedModel):
     print_color_checked = models.DateTimeField(blank=True, null=True)
     # pages (MtM)
     pages_checked = models.DateTimeField(blank=True, null=True)
-    artists = models.ManyToManyField(Person)
+    artists = models.ManyToManyField(Person, related_name='graphics')
     caption = models.TextField(blank=True)
     caption_checked = models.DateTimeField(blank=True, null=True)
     left = models.PositiveSmallIntegerField(null=True, blank=True)
@@ -453,7 +453,7 @@ class Box(TimeStampedModel):
 
 
 class Table(TimeStampedModel):
-    heading_page = models.ForeignKey(Page, on_delete=models.CASCADE)
+    heading_page = models.ForeignKey(Page, on_delete=models.CASCADE, related_name='table_headings')
     pages = models.ManyToManyField(Page, related_name='tables')
     pages_checked = models.DateTimeField(blank=True, null=True)
     title = models.CharField(max_length=63, blank=True, null=True)
@@ -466,7 +466,7 @@ class Table(TimeStampedModel):
     inputs_checked = models.DateTimeField(blank=True, null=True)
     outputs = ArrayField(models.CharField(max_length=63), null=True, blank=True)
     outputs_checked = models.DateTimeField(blank=True, null=True)
-    topics = models.ManyToManyField(Topic)
+    topics = models.ManyToManyField(Topic, related_name='tables')
     topics_checked = models.DateTimeField(blank=True, null=True)
 
 
