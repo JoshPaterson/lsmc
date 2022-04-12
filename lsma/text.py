@@ -3,10 +3,12 @@ import string
 import hunspell
 dictionary = hunspell.HunSpell('/usr/share/hunspell/en_US.dic', '/usr/share/hunspell/en_US.aff')
 
-regex = re.compile(f'[{re.escape(string.punctuation)}]')
+modified_punctuation = string.punctuation.replace('-', '')
+regex = re.compile(f'[{re.escape(modified_punctuation)}]')
 
 def word_list_to_text(word_list: list):
     words = [word.lower() for word in word_list if word != '']
+
     words_no_hyphen = []
     skip = False
     for word in words:
@@ -19,6 +21,7 @@ def word_list_to_text(word_list: list):
         else:
             words_no_hyphen.append(word[:-1])
             skip = True
+
     words = [regex.sub('', word) for word in words_no_hyphen]
     words = [word for word in words if word != '']
     return ' '.join(words)
