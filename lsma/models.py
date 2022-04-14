@@ -4,10 +4,8 @@ from treenode.models import TreeNodeModel
 from django.utils.html import mark_safe
 from django.contrib.postgres.fields import ArrayField
 from django_extensions.db.models import TimeStampedModel
-from imagekit import ImageSpec, register
 from imagekit.models import ImageSpecField
-from imagekit.processors import Thumbnail, Crop
-from imagekit.utils import get_field_info
+from imagekit.processors import Thumbnail
 from .text import word_list_to_text
 
 
