@@ -1,11 +1,7 @@
 from django.contrib import admin
 from treenode.admin import TreeNodeModelAdmin
 from treenode.forms import TreeNodeForm
-from .models import Book, Topic, Page, Section, Person, Graphic, Box, Table, OcrFix
-
-@admin.register(Table)
-class TableAdmin(admin.ModelAdmin):
-    pass
+from .models import Book, Topic, Page, Section, Person, Graphic, Box, OcrFix
 
 @admin.register(OcrFix)
 class OcrFixAdmin(admin.ModelAdmin):

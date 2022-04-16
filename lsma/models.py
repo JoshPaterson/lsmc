@@ -15,6 +15,8 @@ class NumberKind(models.TextChoices):
     ROMAN_LOWER = 'i'
     LETTER_UPPER = 'A'
     LETTER_LOWER = 'a'
+    ORDINAL_WORD = 'F'
+    ORDINAL_NUMBER = 'f'
 
 
 class Topic(TreeNodeModel, TimeStampedModel):
@@ -87,12 +89,12 @@ class Page(TimeStampedModel):
         DECORATIVE_PAPER = 'DEC'
         FULL_AD = 'FAD'
         PARTIAL_AD = 'PAD'
-        EQUATIONS = 'EQS'
-        GRAPHICS = 'GRA'
+        OTHER = 'OTH'
 
-    class Direction(models.TextChoices):
-        LEFT = 'L'
-        RIGHT = 'R'
+    class Rotation(models.TextChoices):
+        CLOCKWISE = 'R'
+        COUNTERCLOCKWISE = 'L'
+        UPSIDE_DOWN = 'U'
 
     book = models.ForeignKey('Book', on_delete=models.CASCADE, related_name='pages')
     number = models.PositiveSmallIntegerField(blank=True, null=True)
@@ -108,14 +110,14 @@ class Page(TimeStampedModel):
     height = models.PositiveSmallIntegerField(blank=True, null=True)
     width = models.PositiveSmallIntegerField(blank=True, null=True)
     graphics = models.ManyToManyField('graphic', blank=True, related_name='pages')
-    text = models.TextField(blank=True, null=True)
+    search_text = models.TextField(blank=True)
     text_generated_at = models.DateTimeField(blank=True, null=True)
     # sections (MtM)
     # section_headings (OtM)
     # tables (MtM)
     kinds = ArrayField(models.CharField(max_length=3, choices=Kind.choices), null=True, blank=True)
     image_problems = ArrayField(models.CharField(max_length=3, choices=ImageProblem.choices), null=True, blank=True)
-    text_top_rotated_to = models.CharField(max_length=1, blank=True, null=True, choices=Direction.choices)
+    text_rotation = models.CharField(max_length=1, blank=True, null=True, default=None, choices=Rotation.choices)
 
     def __str__(self):
         return f'pg. {self.number}'
@@ -151,14 +153,15 @@ class Page(TimeStampedModel):
         word_boxes = self.boxes.filter(level=Box.Level.WORD)
         word_list = [box.text for box in word_boxes]
         text = word_list_to_text(word_list)
-        self.text = text
+        self.search_text = text
         self.save()
 
 
 class Section(TimeStampedModel):
     class Kind(models.TextChoices):
-        CHAPTER = 'CHG'
-        CHAPTER_GROUP = 'CHA'
+        CHAPTER = 'CHA'
+        CHAPTER_GROUP = 'CH1'
+        SUBCHAPTER = 'SU1'
         PREFACE = 'PRE'
         INTRODUCTION = 'INT'
         DEDICATION = 'DED'
@@ -170,10 +173,13 @@ class Section(TimeStampedModel):
         APPENDIX = 'APP'
         INDEX = 'IND'
         PUBLISHERS_CATALOG = 'CAT'
+        TABLE = 'TAB'
         TABLES = 'TAS'
         ARTICLE = 'ART'
         FIGURE = 'FIG'
         PLATES = 'PLA'
+        ERRATA = 'ERR'
+        OTHER = 'OTH'
 
     book = models.ForeignKey('Book', on_delete=models.CASCADE, related_name='sections')
     kind = models.CharField(max_length=3, choices=Kind.choices, blank=True)
@@ -183,9 +189,8 @@ class Section(TimeStampedModel):
     title = models.CharField(max_length=100, blank=True)
     title_checked = models.DateTimeField(blank=True, null=True)
     number = models.PositiveSmallIntegerField(null=True, blank=True)
-    number_checked = models.DateTimeField(blank=True, null=True)
     number_kind = models.CharField(max_length=1, choices=NumberKind.choices, blank=True)
-    number_kind_checked = models.DateTimeField(blank=True, null=True)
+    number_checked = models.DateTimeField(blank=True, null=True)
     for_edition = models.PositiveSmallIntegerField(null=True, blank=True)
     for_edition_checked = models.DateTimeField(blank=True, null=True)
     heading_page = models.ForeignKey(Page, on_delete=models.RESTRICT, related_name='section_headings')
@@ -244,6 +249,8 @@ class Book(TimeStampedModel):
     title_page_checked = models.DateTimeField(blank=True, null=True)
     copyright_page = models.OneToOneField(Page, related_name='copyright_page_for', on_delete=models.SET_NULL, blank=True, null=True)
     copyright_page_checked = models.DateTimeField(blank=True, null=True)
+    printing_info_page = models.OneToOneField(Page, related_name='printing_info_page_for', on_delete=models.SET_NULL, blank=True, null=True)
+    printing_info_page_checked = models.DateTimeField(blank=True, null=True)
     has_vector_text = models.BooleanField(null=True)
     has_vector_text_checked = models.DateTimeField(blank=True, null=True)
     title = models.CharField(max_length=100, blank=True)
@@ -253,13 +260,11 @@ class Book(TimeStampedModel):
     edition_number = models.PositiveSmallIntegerField(null=True, blank=True)
     edition_number_checked = models.DateTimeField(blank=True, null=True)
     volume_number = models.PositiveSmallIntegerField(null=True, blank=True)
-    volume_number_checked = models.DateTimeField(blank=True, null=True)
     volume_number_kind = models.CharField(max_length=1, choices=NumberKind.choices, blank=True)
-    volume_number_kind_checked = models.DateTimeField(blank=True, null=True)
+    volume_number_checked = models.DateTimeField(blank=True, null=True)
     issue_number = models.PositiveSmallIntegerField(null=True, blank=True)
-    issue_number_checked = models.DateTimeField(blank=True, null=True)
     issue_number_kind = models.CharField(max_length=1, choices=NumberKind.choices, blank=True)
-    issue_number_kind_checked = models.DateTimeField(blank=True, null=True)
+    issue_number_checked = models.DateTimeField(blank=True, null=True)
     printing_number = models.PositiveSmallIntegerField(null=True, blank=True)
     printing_number_checked = models.DateTimeField(blank=True, null=True)
     numbers_offset = models.PositiveSmallIntegerField(null=True, blank=True)
@@ -355,11 +360,18 @@ class Graphic(TimeStampedModel):
         DECORATION = 'DEC'
         EQUATION = 'EQU'
         MUSIC_NOTATION = 'MUS'
+        TABLE = 'TAB'
 
     class Color(models.TextChoices):
         COLOR = 'COL'
         BITONAL = 'BIT'
         GRAYSCALE = 'GRA'
+
+    class Kind(models.TextChoices):
+        FIGURE = 'FIG'
+        PLATE = 'PLA'
+        EQUATION = 'EQU'
+        TABLE = 'TAB'
 
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='graphics')
     medium = models.CharField(max_length=3, choices=Medium.choices, blank=True)
@@ -371,18 +383,28 @@ class Graphic(TimeStampedModel):
     # pages (MtM)
     pages_checked = models.DateTimeField(blank=True, null=True)
     artists = models.ManyToManyField(Person, related_name='graphics')
+    artists_checked = models.DateTimeField(blank=True, null=True)
     caption = models.TextField(blank=True)
     caption_checked = models.DateTimeField(blank=True, null=True)
+    title = models.TextField(blank=True)
+    title_checked = models.DateTimeField(blank=True, null=True)
     left = models.PositiveSmallIntegerField(null=True, blank=True)
     top = models.PositiveSmallIntegerField(null=True, blank=True)
     width = models.PositiveSmallIntegerField(null=True, blank=True)
     height = models.PositiveSmallIntegerField(null=True, blank=True)
-    caption_left = models.PositiveSmallIntegerField(null=True, blank=True)
-    caption_top = models.PositiveSmallIntegerField(null=True, blank=True)
-    caption_width = models.PositiveSmallIntegerField(null=True, blank=True)
-    caption_height = models.PositiveSmallIntegerField(null=True, blank=True)
+    left_with_text = models.PositiveSmallIntegerField(null=True, blank=True)
+    top_with_text = models.PositiveSmallIntegerField(null=True, blank=True)
+    width_with_text = models.PositiveSmallIntegerField(null=True, blank=True)
+    height_with_text = models.PositiveSmallIntegerField(null=True, blank=True)
     box_checked = models.DateTimeField(blank=True, null=True)
-    caption_box_checked = models.DateTimeField(blank=True, null=True)
+    box_with_text_checked = models.DateTimeField(blank=True, null=True)
+    section_kind = models.CharField(max_length=3, blank=True, choices=Kind.choices)
+    section_kind_checked = models.DateTimeField(blank=True, null=True)
+    section_number = models.PositiveSmallIntegerField(blank=True, null=True)
+    section_number_kind = models.CharField(max_length=1, blank=True, choices=NumberKind.choices)
+    section_number_checked = models.DateTimeField(blank=True, null=True)
+
+
 
     def __str__(self):
         return f'{self.kind} on pg. {self.pages[0].number} of {self.book}'
@@ -448,25 +470,6 @@ class Box(TimeStampedModel):
             # TODO: test if the word changed before doing this:
             self.page.generate_text()
         super(Box, self).save(*args, **kwargs)
-
-
-
-class Table(TimeStampedModel):
-    heading_page = models.ForeignKey(Page, on_delete=models.CASCADE, related_name='table_headings')
-    pages = models.ManyToManyField(Page, related_name='tables')
-    pages_checked = models.DateTimeField(blank=True, null=True)
-    title = models.CharField(max_length=63, blank=True, null=True)
-    title_checked = models.DateTimeField(blank=True, null=True)
-    number = models.PositiveSmallIntegerField(blank=True, null=True)
-    number_checked = models.DateTimeField(blank=True, null=True)
-    number_kind = models.CharField(max_length=1, blank=True, choices=NumberKind.choices)
-    number_kind_checked = models.DateTimeField(blank=True, null=True)
-    inputs = ArrayField(models.CharField(max_length=63), null=True, blank=True)
-    inputs_checked = models.DateTimeField(blank=True, null=True)
-    outputs = ArrayField(models.CharField(max_length=63), null=True, blank=True)
-    outputs_checked = models.DateTimeField(blank=True, null=True)
-    topics = models.ManyToManyField(Topic, related_name='tables')
-    topics_checked = models.DateTimeField(blank=True, null=True)
 
 
 class OcrFix(TimeStampedModel):

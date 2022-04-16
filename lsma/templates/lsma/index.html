@@ -5,6 +5,112 @@
     <title>My test page</title>
   </head>
   <body>
-    <p>This is my page</p>
+    <h1>Processing Stages</h1>
+    <p>There are {{ book_count }} books.</p>
+    <div>
+      <h2>Automatic Fields</h2>
+      <ul>
+        <li>Scan color checked: {{ book_counts.scan_color_checked__count }}</li>
+        <li>Has vector text checked: {{ book_counts.has_vector_text_checked__count }}</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Basic info</h2>
+      <ul>
+        <li>Title page checked: {{ book_counts.title_page_checked__count }}</li>
+        <li>Copyright page checked: {{ book_counts.copyright_page_checked__count }}</li>
+        <li>Printing page checked: {{ book_counts.printing_info_page_checked__count }}</li>
+        <li>Topics checked: {{ book_counts.topics_checked__count }}</li>
+        <li>Enter page offset: {{ book_counts.numbers_offset_checked__count }}</li>
+        <li>Enter roman numeral page offset: {{ book_counts.roman_numbers_offset_checked__count }}</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Bibliographic Info</h2>
+        <ul>
+          <li>Title checked: {{ book_counts.title_checked__count }}</li>
+          <li>Subtitle checked: {{ book_counts.subtitle_checked__count }}</li>
+          <li>Contributions checked: {{ book_counts.contributions_checked__count }}</li>
+          <li>Volume number checked: {{ book_counts.volume_number_checked__count }}</li>
+          <li>Edition number checked: {{ book_counts.edition_number_checked__count }}</li>
+          <li>Issue number checked: {{ book_counts.issue_number_checked__count }}</li>
+          <li>Series checked: {{ book_counts.series_checked__count }}</li>
+          <li>Cities checked: {{ book_counts.cities_checked__count }}</li>
+          <li>Publishing frequency checked: {{ book_counts.publishing_frequency_checked__count }}</li>
+        </ul>
+        <ul>
+          <li>Date published checked: {{ book_counts.date_published_checked__count }}</li>
+          <li>In copyright checked: {{ book_counts.in_copyright_checked__count }}</li>
+          <li>Copyright years checked: {{ book_counts.copyright_years_checked__count }}</li>
+          <li>Has ligatures checked: {{ book_counts.has_ligatures_checked__count }}</li>
+          <li>Publishers checked: {{ book_counts.publishers_checked__count }}</li>
+          <li>Printing number checked: {{ book_counts.printing_number_checked__count }}</li>
+        </ul>
+        <ul>
+          <li>Printer checked: {{ book_counts.printers_checked__count }}</li>
+        </ul>
+    </div>
+    <div>
+      <h2>Sections</h2>
+      <ul>
+        <li>Choose page kinds</li>
+        <li>Choose section heading pages: {{ book_counts.sections_checked__count }}</li>
+        <ul>
+          <li>Choose section kinds: {{ section_counts.kind_checked__count }}</li>
+          <ul>
+            <li>Choose which are chapters</li>
+            <li>Enter other section kinds</li>
+          </ul>
+          <li>Are any sections by different contributors? {{ section_counts.contributions_checked__count }}</li>
+          <li>Enter kind in book {{ section_counts.kind_in_book_checked__count }}</li>
+          <li>Enter for edition {{ section_counts.for_edition_checked__count }}</li>
+          <li>Enter section number {{ section_counts.number_checked__count }}</li>
+          <li>Enter section title {{ section_counts.title_checked__count }}</li>
+          <li>Enter section first_page {{ section_counts.first_page_checked__count }}</li>
+          <li>Enter section last_page {{ section_counts.last_page_checked__count }}</li>
+          <li>Enter section topics {{ section_counts.topics_checked__count }}</li>
+        </ul>
+      </ul>
+    </div>
+    <div>
+      <h2>Graphics</h2>
+      <ul>
+        <li>Choose pages with graphics {{ book_counts.graphics_checked__count }}</li>
+        <ul>
+          <li>Draw graphic box with text {{ graphic_counts.box_with_text_checked__count }}</li>
+          <ul>
+            <li>Choose section kind {{ graphic_counts.section_kind_checked__count }}</li>
+            <li>Enter section_number {{ graphic_counts.section_number_checked__count }}</li>
+            <li>Enter title {{ graphic_counts.title_checked__count }}</li>
+            <li>Enter caption {{ graphic_counts.caption_checked__count }}</li>
+            <li>Enter graphic medium {{ graphic_counts.medium_checked__count }}</li>
+            <li>Enter graphic contents {{ graphic_counts.content_checked__count }}</li>
+            <li>Enter print color {{ graphic_counts.print_color_checked__count }}</li>
+            <li>Enter artists {{ graphic_counts.artists_checked__count }}</li>
+            <li>Draw box without text {{ graphic_counts.box_checked__count }}</li>
+          </ul>
+        </ul>
+      </ul>
+    </div>
+    <div>
+      <h2>OCR corrections</h2>
+      <ul>
+        <li>enter other languages: {{ book_counts.other_languages_checked__count }}</li>
+        <li>delete empty boxes</li>
+        <li>Mark words incorrect</li>
+        <ul>
+          <li>look page by page for incorrect words</li>
+          <li>look at lowest confidence words to mark incorrect</li>
+        </ul>
+        <li>Fix incorrect words</li>
+        <ul>
+          <li>ligature fix bot</li>
+          <li>dictionary bot</li>
+          <li>bert bot</li>
+          <li>previous suggestions</li>
+          <li>manually type in corrections</li>
+        </ul>
+      </ul>
+    </div>
   </body>
 </html>
