@@ -158,7 +158,8 @@ class Page(TimeStampedModel):
         self.save()
 
 
-class Section(TimeStampedModel):
+class Section(TreeNodeModel, TimeStampedModel):
+    treenode_display_field = 'display_name'
     class Kind(models.TextChoices):
         FRONT_MATTER = 'FMA'
         BODY = 'BOD'
@@ -205,6 +206,13 @@ class Section(TimeStampedModel):
             return f'{self.book.get_absolute_url()}/{self.kind}/{self.number}'
         else:
             return f'{self.book.get_absolute_url()}/section/{self.id}'
+
+    @property
+    def display_name(self):
+        if self.number:
+            return f'{self.Kind(self.kind).label} {self.number}'
+        else:
+            return self.Kind(self.kind).label
 
     class Meta:
         ordering = ['heading_page']

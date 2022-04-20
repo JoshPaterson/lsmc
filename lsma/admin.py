@@ -7,6 +7,8 @@ from .models import Book, Topic, Page, Section, Person, Graphic, Box, OcrFix, Bo
 class OcrFixAdmin(admin.ModelAdmin):
     pass
 
+
+
 @admin.register(Graphic)
 class GraphicAdmin(admin.ModelAdmin):
     pass
@@ -85,8 +87,9 @@ class PageAdmin(admin.ModelAdmin):
 
 
 @admin.register(Section)
-class SectionAdmin(admin.ModelAdmin):
-    pass
+class SectionAdmin(TreeNodeModelAdmin):
+    treenode_display_mode = TreeNodeModelAdmin.TREENODE_DISPLAY_MODE_ACCORDION
+    form = TreeNodeForm
 
 
 @admin.register(Person)
