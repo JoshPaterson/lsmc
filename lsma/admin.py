@@ -1,46 +1,47 @@
 from django.contrib import admin
 from treenode.admin import TreeNodeModelAdmin
 from treenode.forms import TreeNodeForm
-from .models import Book, Topic, Page, Section, Person, Graphic, Box, OcrFix
+from .models import Book, Topic, Page, Section, Person, Graphic, Box, OcrFix, BookCheck, SectionCheck, GraphicCheck
 
 @admin.register(OcrFix)
 class OcrFixAdmin(admin.ModelAdmin):
     pass
 
 @admin.register(Graphic)
-class GraphicKindAdmin(admin.ModelAdmin):
+class GraphicAdmin(admin.ModelAdmin):
     pass
+
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_published'
     fieldsets = (
         ('Title', {
-            'fields': (('title', 'title_checked'), ('subtitle', 'subtitle_checked'), ('volume_number','volume_number_checked'), ('volume_number_kind', 'volume_number_kind_checked'), ('issue_number','issue_number_checked'), ('issue_number_kind', 'issue_number_kind_checked'), ('edition_number','edition_number_checked'), ('series_name', 'number_in_series', 'number_in_series_kind', 'series_checked'))
+            'fields': (('title', 'subtitle'), ('volume_number', 'volume_number_kind'), ('issue_number', 'issue_number_kind'), ('edition_number',), ('series_name', 'number_in_series', 'number_in_series_kind'))
         }),
         ('People', {
-            'fields': (('contributions', 'contributions_checked'),)
+            'fields': ('contributions',)
         }),
         ('Title/ Copyright Pages', {
-            'fields': (('title_page', 'title_page_checked'), ('copyright_page', 'copyright_page_checked'))
+            'fields': ('title_page', 'copyright_page')
         }),
         ('Topics', {
-            'fields': ('topics', 'topics_checked')
+            'fields': ('topics',)
         }),
         ('Book', {
-            'fields': (('has_vector_text', 'has_vector_text_checked'), ('has_ligatures', 'has_ligatures_checked'), ('scan_color', 'scan_color_checked'), ('numbers_offset', 'numbers_offset_checked'), ('roman_numbers_offset', 'roman_numbers_offset_checked'), ('other_languages', 'other_languages_checked'))
+            'fields': ('has_vector_text', 'has_ligatures', 'scan_color', 'numbers_offset', 'roman_numbers_offset', 'other_languages')
         }),
         ('Other', {
             'fields': ('slug', 'uuid', 'url', 'downloaded_at', 'hidden')
         }),
         ('Date', {
-            'fields': (('date_published', 'date_published_checked'), ('in_copyright', 'in_copyright_checked'),('publishing_frequency', 'publishing_frequency_checked'))
+            'fields': ('date_published', 'in_copyright', 'publishing_frequency')
         }),
         ('Printing', {
-            'fields': (('printing_number', 'printing_number_checked'), ('copyright_years', 'copyright_years_checked'), ('printers', 'printers_checked'))
+            'fields': ('printing_number', 'copyright_years', 'printers')
         }),
         ('Publisher', {
-            'fields': (('publishers', 'publishers_checked'), ('cities', 'cities_checked'))
+            'fields': ('publishers', 'cities')
         }),
     )
     readonly_fields = ('slug', 'uuid', 'downloaded_at')
@@ -53,10 +54,27 @@ class BookAdmin(admin.ModelAdmin):
             kwargs['queryset'] = Page.objects.filter(book=book_id)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+
+@admin.register(BookCheck)
+class BookCheckAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(SectionCheck)
+class SectionCheckAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(GraphicCheck)
+class GraphicCheckAdmin(admin.ModelAdmin):
+    pass
+
+
 @admin.register(Topic)
 class TopicAdmin(TreeNodeModelAdmin):
     treenode_display_mode = TreeNodeModelAdmin.TREENODE_DISPLAY_MODE_ACCORDION
     form = TreeNodeForm
+
 
 @admin.register(Page)
 class PageAdmin(admin.ModelAdmin):
@@ -65,12 +83,14 @@ class PageAdmin(admin.ModelAdmin):
     list_display = ['book', 'number', 'thumbnail_tag']
     list_per_page = 20
 
+
 @admin.register(Section)
 class SectionAdmin(admin.ModelAdmin):
     pass
 
+
 @admin.register(Person)
-class AuthorAdmin(admin.ModelAdmin):
+class PersonAdmin(admin.ModelAdmin):
     pass
 
 

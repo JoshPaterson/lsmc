@@ -9,4 +9,3 @@ django-extensions
 requests
 psycopg2
 django-imagekit
-pyinotify

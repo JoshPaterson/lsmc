@@ -1,6 +1,6 @@
 from operator import ge
 from django.urls import path
-from . import views
+from lsma import views
 
 urlpatterns = [
     path('', views.IndexView.as_view()),
