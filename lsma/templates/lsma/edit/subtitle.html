@@ -1,0 +1,19 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>My test page</title>
+  </head>
+  <body>
+    <h1>Enter subtitle</h1>
+    <img src="{{book.title_page.jpg_image.url}}" alt="" style="height:1000px">
+    <form action="/edit/subtitle", method="post">
+      {% csrf_token %}
+        <label for="subtitle">Subtitle</label>
+        <input type="text" id="subtitle" name="subtitle" value="{{book.subtitle}}">
+        <input type="hidden" name="book_uuid" value="{{book.uuid}}">
+      <input type="submit" value="Submit">
+    </form>
+  </body>
+</html>

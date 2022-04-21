@@ -6,4 +6,6 @@ urlpatterns = [
     path('', views.IndexView.as_view()),
     path('edit/title-page', views.EditTitlePageView.as_view()),
     path('edit/copyright-page', views.EditCopyrightPageView.as_view()),
+    path('edit/title', views.EditTitleView.as_view()),
+    path('edit/subtitle', views.EditSubtitleView.as_view()),
 ]

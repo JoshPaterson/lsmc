@@ -28,8 +28,8 @@
     <div>
       <h2>Bibliographic Info</h2>
         <ul>
-          <li>Title checked: {{ book_check_counts.TITLE|default:0 }}</li>
-          <li>Subtitle checked: {{ book_check_counts.SUBTITLE|default:0 }}</li>
+          <li><a href="/edit/title">Title checked:</a> {{ book_check_counts.TITLE|default:0 }}</li>
+          <li><a href="/edit/subtitle">Subtitle checked:</a> {{ book_check_counts.SUBTITLE|default:0 }}</li>
           <li>Contributions checked: {{ book_check_counts.CONTRIBUTIONS|default:0 }}</li>
           <li>Volume number checked: {{ book_check_counts.VOLUME_NUMBER|default:0 }}</li>
           <li>Edition number checked: {{ book_check_counts.EDITION_NUMBER|default:0 }}</li>
