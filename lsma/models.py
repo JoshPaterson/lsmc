@@ -471,6 +471,8 @@ class BookCheck(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     kind = models.CharField(max_length=3, choices=Kind.choices)
+    old_value = models.CharField(max_length=127, null=True, blank=True)
+    new_value = models.CharField(max_length=127, null=True, blank=True)
 
 
 class SectionCheck(models.Model):
@@ -489,6 +491,8 @@ class SectionCheck(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     kind = models.CharField(max_length=3, choices=Kind.choices)
+    old_value = models.CharField(max_length=127, null=True, blank=True)
+    new_value = models.CharField(max_length=127, null=True, blank=True)
 
 
 class GraphicCheck(models.Model):
@@ -509,6 +513,8 @@ class GraphicCheck(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     kind = models.CharField(max_length=3, choices=Kind.choices)
+    old_value = models.CharField(max_length=127, null=True, blank=True)
+    new_value = models.CharField(max_length=127, null=True, blank=True)
 
 
 class OcrFix(TimeStampedModel):

@@ -27,12 +27,37 @@ class IndexView(TemplateView):
 
 
 class EditTitlePageView(TemplateView):
-
     def get(self, request):
         book = Book.objects.filter(title_page__isnull=True).first()
+        if book == None:
+            return redirect('/')
         pages = book.pages.all()[:20]
         return render(request, f'lsma/edit/title-page.html', {'book': book, 'pages': pages})
 
     def post(self, request, *args, **kwargs):
-        # process data here
+        book = Book.objects.get(uuid=request.POST['book_uuid'])
+        old_value = book.title_page
+        page = book.pages.get(number=request.POST['page_number'])
+        book.title_page = page
+        book.save()
+        BookCheck.objects.create(book=book, user=request.user, kind=BookCheck.Kind.TITLE_PAGE, old_value=old_value, new_value=request.POST['page_number'])
+        
         return redirect('/edit/title-page')
+
+
+class EditCopyrightPageView(TemplateView):
+    def get(self, request):
+        book = Book.objects.filter(copyright_page__isnull=True).first()
+        if book == None:
+            return redirect('/')
+        pages = book.pages.all()[:20]
+        return render(request, f'lsma/edit/copyright-page.html', {'book': book, 'pages': pages})
+
+    def post(self, request, *args, **kwargs):
+        book = Book.objects.get(uuid=request.POST['book_uuid'])
+        old_value = book.title_page
+        page = book.pages.get(number=request.POST['page_number'])
+        book.copyright_page = page
+        book.save()
+        BookCheck.objects.create(book=book, user=request.user, kind=BookCheck.Kind.COPYRIGHT_PAGE, old_value=old_value, new_value=request.POST['page_number'])
+        return redirect('/edit/copyright-page')

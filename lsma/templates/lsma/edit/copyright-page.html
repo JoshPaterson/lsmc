@@ -6,8 +6,8 @@
     <title>My test page</title>
   </head>
   <body>
-    <h1>Choose title page</h1>
-    <form action="/edit/title-page", method="post">
+    <h1>Choose copyright page</h1>
+    <form action="/edit/copyright-page", method="post">
       {% csrf_token %}
       {% for page in pages %}
         <label>
