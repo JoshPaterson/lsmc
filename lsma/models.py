@@ -90,6 +90,7 @@ class Page(TimeStampedModel):
         DECORATIVE_PAPER = 'DEC'
         FULL_AD = 'FAD'
         PARTIAL_AD = 'PAD'
+        LIBRARY_STAMP = 'LIB'
         OTHER = 'OTH'
 
     class Rotation(models.TextChoices):
@@ -184,6 +185,12 @@ class Section(TreeNodeModel, TimeStampedModel):
         FIGURE = 'FIG'
         PLATES = 'PLA'
         ERRATA = 'ERR'
+        EPIGRAPH = 'EPI'
+        FOREWORD = 'FOR'
+        LIST_OF_TABLES = 'LTA'
+        LIST_OF_FIGURES = 'LFI'
+        LIST_OF_PLATES = 'LPL'
+        LIST_OF_EQUATIONS = 'LEQ'
         OTHER = 'OTH'
 
     book = models.ForeignKey('Book', on_delete=models.CASCADE, related_name='sections')
@@ -241,7 +248,7 @@ class Book(TimeStampedModel):
 
     uuid = models.UUIDField(max_length=36, null=True, blank=True, unique=True)
     url = models.URLField(blank=True, null=True)
-    downloaded_at = models.DateField(null=True, blank=True)
+    downloaded_at = models.DateTimeField(null=True, blank=True)
     date_published = models.DateField(null=True, blank=True)
     publishing_frequency = models.CharField(max_length=1, choices=PublishingFrequency.choices, blank=True)
     scan_color = models.CharField(max_length=3, choices=Color.choices, blank=True)
@@ -294,7 +301,7 @@ class Book(TimeStampedModel):
     def get_full_title(self):
         full_title = ''
         if self.title:
-            title = full_title + self.title
+            full_title = full_title + self.title
         if self.volume_number:
             full_title = full_title + f' vol. {self.volume_number}'
         if self.edition_number:
@@ -387,8 +394,8 @@ class Box(TimeStampedModel):
     page = models.ForeignKey(Page, on_delete=models.CASCADE, blank=True, related_name='boxes')
     parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='children')
     order = models.PositiveIntegerField()
-    original_text = models.CharField(max_length=32, blank=True, editable=False)
-    text = models.CharField(max_length=32, blank=True)
+    original_text = models.CharField(max_length=63, blank=True, editable=False)
+    text = models.CharField(max_length=63, blank=True)
     level = models.PositiveSmallIntegerField(choices=Level.choices)
     page_number = models.PositiveSmallIntegerField()
     block_number = models.PositiveSmallIntegerField()

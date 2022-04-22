@@ -10,7 +10,7 @@ class Command(BaseCommand):
         parser.add_argument('urls', nargs='+', type=str, help='urls that end in .pdf')
 
     def handle(self, *args, **options):
-        pdf_dir = Path('pdfs')
+        pdf_dir = Path('new_pdf_downloads')
         urls = options['urls']
         for url in urls:
             self.stdout.write(f'downloading {url}')
@@ -18,6 +18,4 @@ class Command(BaseCommand):
             pdf_path = pdf_dir / (str(uuid) + '.pdf')
             download_url(url, pdf_path)
             add_metadata(pdf_path, url, uuid)
-            self.stdout.write(f'importing {url}')
-            add_book(pdf_path)
-            self.stdout.write(f'done with {url}')
+            self.stdout.write(f'{url} downloaded')

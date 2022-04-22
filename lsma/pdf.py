@@ -6,6 +6,7 @@ import pytesseract
 from PIL import Image
 from pathlib import Path
 from django.db.utils import IntegrityError
+from datetime import datetime, timezone
 
 import requests
 
@@ -24,6 +25,8 @@ def add_metadata(pdf_path: str, url: str, uuid: UUID) -> None:
         with pdf.open_metadata() as meta:
             meta['lsma:UUID'] = str(uuid)
             meta['lsma:URL'] = url
+            now_utc = datetime.now().replace(tzinfo=timezone.utc)
+            meta['lsma:Downloaded_at'] = str(now_utc)
         pdf.save()
     return
 
@@ -33,7 +36,8 @@ def get_metadata(pdf_path: str) -> UUID:
             uuid_str = meta['lsma:UUID']
             uuid = UUID(hex=uuid_str)
             url = meta['lsma:URL']
-            return uuid, url
+            downloaded_at = datetime.fromisoformat(meta['lsma:Downloaded_at'])
+            return uuid, url, downloaded_at
 
 
 def extract_images(pdf_path, original_folder):
@@ -42,14 +46,25 @@ def extract_images(pdf_path, original_folder):
         original_folder.mkdir()
     for i, page in enumerate(pdf.pages, start=1):
         xobject = page['/Resources']['/XObject']
+        images = []
         for image in xobject.items():
             try:
-                image = PdfImage(image[1])
+                images.append(PdfImage(image[1]))
             except TypeError:
                 continue
-            # might need some logic here to take the largest image on the page
-            filename = image.extract_to(fileprefix=f'{original_folder}/{i}')
+        images.sort(key=lambda i: i.height)
+        filename = images[-1].extract_to(fileprefix=f'{original_folder}/{i}')
     pdf.close()
+
+def convert_images(folder: Path):
+    jpg2000_images = folder.glob('*.jp2')
+    if jpg2000_images:
+        jp2_folder = folder / 'jp2'
+        jp2_folder.mkdir(exist_ok=True)
+    for image in jpg2000_images:
+        moved_image = image.rename(jp2_folder/image.name)
+        im = Image.open(moved_image)
+        im.save(moved_image.parents[1]/f'{moved_image.stem}.png')
 
 def get_boxes(image_path: str) -> list[list]:
     data = pytesseract.image_to_data(Image.open(image_path))
@@ -63,17 +78,18 @@ def get_stem(path):
     return int(path.stem)
 
 def add_book(pdf_path):
-    uuid, url = get_metadata(pdf_path)
+    uuid, url, downloaded_at = get_metadata(pdf_path)
     try:
-        book = Book.objects.create(uuid=uuid, url=url)
+        book = Book.objects.create(uuid=uuid, url=url, downloaded_at=downloaded_at)
     except IntegrityError:
         raise ValueError('This book is already in the db')
     print(f'Added book {url}')
 
     original_image_dir = Path(f'original_page_images/{str(uuid)[:8]}')
     extract_images(pdf_path, original_image_dir)
+    convert_images(original_image_dir)
 
-    original_images = sorted(original_image_dir.glob('*'), key=get_stem)
+    original_images = sorted(original_image_dir.glob('*.*'), key=get_stem)
 
     for original_image in original_images:
         page = Page.objects.create(book=book, original_image=str(original_image), number=int(original_image.stem))
