@@ -90,7 +90,7 @@ class Page(TimeStampedModel):
         DECORATIVE_PAPER = 'DEC'
         FULL_AD = 'FAD'
         PARTIAL_AD = 'PAD'
-        LIBRARY_STAMP = 'LIB'
+        BOOKPLATE = 'BOO'
         OTHER = 'OTH'
 
     class Rotation(models.TextChoices):
@@ -330,6 +330,7 @@ class Graphic(TimeStampedModel):
         LITHOGRAPH = 'LIT'
         MEZZOTINT = 'MEZ'
         AQUATINT = 'AQU'
+        HALF_TONE = 'HAL'
         # see art of engraving, with the various modes of operation Under the Following Different Divisions: Eching, Soft-ground Etching, Line-engraving, Dhalk and Stipple, Aquiatint, Mezzotint, Lithography, Wood Engraving, Medallic Engraving, Electrography, and Photography: Illustrated with Specimens of the Different Styles of Engraving. London: Ackermann and Co., 1841
 
     class Content(models.TextChoices):

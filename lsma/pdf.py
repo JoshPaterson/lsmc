@@ -52,7 +52,10 @@ def extract_images(pdf_path, original_folder):
                 images.append(PdfImage(image[1]))
             except TypeError:
                 continue
-        images.sort(key=lambda i: i.height)
+        images.sort(key=lambda x: x.height)
+        page_image = images[-1]
+        if i==1 and page_image.height == 750 and page_image.width == 1800:
+            continue
         filename = images[-1].extract_to(fileprefix=f'{original_folder}/{i}')
     pdf.close()
 
