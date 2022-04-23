@@ -10,88 +10,90 @@
     <div>
       <h2>Automatic Fields</h2>
       <ul>
-        <li>Scan color checked: {{ book_check_counts.SCAN_COLOR|default:0 }}</li>
-        <li>Has vector text checked: {{ book_check_counts.HAS_VECTOR_TEXT|default:0 }}</li>
+        <li>Scan color checked: {{ book_check_counts.SCAN_COLOR }}</li>
+        <li>Has vector text checked: {{ book_check_counts.HAS_VECTOR_TEXT }}</li>
       </ul>
     </div>
     <div>
       <h2>Basic info</h2>
       <ul>
-        <li><a href="/edit/title-page">Title page checked:</a> {{ book_check_counts.TITLE_PAGE|default:0 }}</li>
-        <li><a href="/edit/copyright-page">Copyright page checked:</a> {{ book_check_counts.COPYRIGHT_PAGE|default:0 }}</li>
-        <li>Printing page checked: {{ book_check_counts.PRINTING_INFO_PAGE|default:0 }}</li>
-        <li>Topics checked: {{ book_check_counts.TOPICS|default:0 }}</li>
-        <li>Enter page offset: {{ book_check_counts.NUMBERS_OFFSET|default:0 }}</li>
-        <li>Enter roman numeral page offset: {{ book_check_counts.ROMAN_NUMBERS_OFFSET|default:0 }}</li>
+        <li><a href="/edit/title-page">Title page checked:</a> {{ book_check_counts.TITLE_PAGE }}</li>
+        <li><a href="/edit/copyright-page">Copyright page checked:</a> {{ book_check_counts.COPYRIGHT_PAGE }}</li>
+        <li>Printing page checked: {{ book_check_counts.PRINTING_INFO_PAGE }}</li>
+        <li>Topics checked: {{ book_check_counts.TOPICS }}</li>
+        <li><a href="/edit/numbers-offset">Enter page offset:</a> {{ book_check_counts.NUMBERS_OFFSET }}</li>
+        <ul>
+          <li><a href="/edit/roman-numbers-offset">Enter roman numeral page offset:</a> {{ book_check_counts.ROMAN_NUMBERS_OFFSET }}</li>
+        </ul>
       </ul>
     </div>
     <div>
       <h2>Bibliographic Info</h2>
         <ul>
-          <li><a href="/edit/title">Title checked:</a> {{ book_check_counts.TITLE|default:0 }}</li>
-          <li><a href="/edit/subtitle">Subtitle checked:</a> {{ book_check_counts.SUBTITLE|default:0 }}</li>
-          <li>Contributions checked: {{ book_check_counts.CONTRIBUTIONS|default:0 }}</li>
-          <li>Volume number checked: {{ book_check_counts.VOLUME_NUMBER|default:0 }}</li>
-          <li>Edition number checked: {{ book_check_counts.EDITION_NUMBER|default:0 }}</li>
-          <li>Issue number checked: {{ book_check_counts.ISSUE_NUMBER|default:0 }}</li>
-          <li>Series checked: {{ book_check_counts.SERIES|default:0 }}</li>
-          <li>Cities checked: {{ book_check_counts.CITIES|default:0 }}</li>
-          <li>Publishing frequency checked: {{ book_check_counts.PUBLISHING_FREQUENCY|default:0 }}</li>
+          <li><a href="/edit/title">Title checked:</a> {{ book_check_counts.TITLE }}</li>
+          <li><a href="/edit/subtitle">Subtitle checked:</a> {{ book_check_counts.SUBTITLE }}</li>
+          <li>Contributions checked: {{ book_check_counts.CONTRIBUTIONS }}</li>
+          <li><a href="/edit/volume-number">Volume number checked:</a> {{ book_check_counts.VOLUME_NUMBER }}</li>
+          <li><a href="/edit/edition-number">Edition number checked:</a> {{ book_check_counts.EDITION_NUMBER }}</li>
+          <li><a href="/edit/issue-number">Issue number checked:</a> {{ book_check_counts.ISSUE_NUMBER }}</li>
+          <li>Series checked: {{ book_check_counts.SERIES }}</li>
+          <li>Cities checked: {{ book_check_counts.CITIES }}</li>
+          <li>Publishing frequency checked: {{ book_check_counts.PUBLISHING_FREQUENCY }}</li>
         </ul>
         <ul>
-          <li>Date published checked: {{ book_check_counts.DATE_PUBLISHED|default:0 }}</li>
-          <li>In copyright checked: {{ book_check_counts.IN_COPYRIGHT|default:0 }}</li>
-          <li>Copyright years checked: {{ book_check_counts.COPYRIGHT_YEARS|default:0 }}</li>
-          <li>Has ligatures checked: {{ book_check_counts.HAS_LIGATURES|default:0 }}</li>
-          <li>Publishers checked: {{ book_check_counts.PUBLISHERS|default:0 }}</li>
-          <li>Printing number checked: {{ book_check_counts.PRINTING_NUMBER|default:0 }}</li>
+          <li>Date published checked: {{ book_check_counts.DATE_PUBLISHED }}</li>
+          <li>In copyright checked: {{ book_check_counts.IN_COPYRIGHT }}</li>
+          <li>Copyright years checked: {{ book_check_counts.COPYRIGHT_YEARS }}</li>
+          <li>Has ligatures checked: {{ book_check_counts.HAS_LIGATURES }}</li>
+          <li>Publishers checked: {{ book_check_counts.PUBLISHERS }}</li>
+          <li>Printing number checked: {{ book_check_counts.PRINTING_NUMBER }}</li>
         </ul>
         <ul>
-          <li>Printer checked: {{ book_check_counts.PRINTERS|default:0 }}</li>
+          <li>Printer checked: {{ book_check_counts.PRINTERS }}</li>
         </ul>
         <ul>
-          <li>Sections checked: {{ book_check_counts.SECTIONS|default:0 }}</li>
-          <li>Graphics checked: {{ book_check_counts.GRAPHICS|default:0 }}</li>
+          <li>Sections checked: {{ book_check_counts.SECTIONS }}</li>
+          <li>Graphics checked: {{ book_check_counts.GRAPHICS }}</li>
           <li></li>
         </ul>
     </div>
     <div>
       <h2>Sections</h2>
       <ul>
-        <li>Choose section kinds: {{ section_check_counts.KIND|default:0 }}</li>
+        <li>Choose section kinds: {{ section_check_counts.KIND }}</li>
         <ul>
           <li>Choose which are chapters</li>
           <li>Enter other section kinds</li>
         </ul>
-        <li>Are any sections by different contributors? {{ section_check_counts.CONTRIBUTIONS|default:0 }}</li>
-        <li>Enter kind in book {{ section_check_counts.KIND_IN_BOOK|default:0 }}</li>
-        <li>Enter for checkion {{ section_check_counts.EDITION|default:0 }}</li>
-        <li>Enter section number {{ section_check_counts.NUMBER|default:0 }}</li>
-        <li>Enter section title {{ section_check_counts.TITLE|default:0 }}</li>
-        <li>Enter section topics {{ section_check_counts.TOPICS|default:0 }}</li>
+        <li>Are any sections by different contributors? {{ section_check_counts.CONTRIBUTIONS }}</li>
+        <li>Enter kind in book {{ section_check_counts.KIND_IN_BOOK }}</li>
+        <li>Enter for checkion {{ section_check_counts.EDITION }}</li>
+        <li>Enter section number {{ section_check_counts.NUMBER }}</li>
+        <li>Enter section title {{ section_check_counts.TITLE }}</li>
+        <li>Enter section topics {{ section_check_counts.TOPICS }}</li>
       </ul>
     </div>
     <div>
       <h2>Graphics</h2>
       <ul>
-        <li>Draw graphic box with text {{ graphic_check_counts.BOX_WITH_TEXT|default:0 }}</li>
+        <li>Draw graphic box with text {{ graphic_check_counts.BOX_WITH_TEXT }}</li>
         <ul>
-          <li>Choose graphic kind {{ graphic_check_counts.KIND|default:0 }}</li>
-          <li>Enter graphic number {{ graphic_check_counts.KIND|default:0 }}</li>
-          <li>Enter title {{ graphic_check_counts.TITLE|default:0 }}</li>
-          <li>Enter caption {{ graphic_check_counts.CAPTION|default:0 }}</li>
-          <li>Enter graphic medium {{ graphic_check_counts.MEDIUM|default:0 }}</li>
-          <li>Enter graphic contents {{ graphic_check_counts.CONTENT|default:0 }}</li>
-          <li>Enter print color {{ graphic_check_counts.PRINT_COLOR|default:0 }}</li>
-          <li>Enter artists {{ graphic_check_counts.ARTISTS|default:0 }}</li>
-          <li>Draw box without text {{ graphic_check_counts.BOX|default:0 }}</li>
+          <li>Choose graphic kind {{ graphic_check_counts.KIND }}</li>
+          <li>Enter graphic number {{ graphic_check_counts.KIND }}</li>
+          <li>Enter title {{ graphic_check_counts.TITLE }}</li>
+          <li>Enter caption {{ graphic_check_counts.CAPTION }}</li>
+          <li>Enter graphic medium {{ graphic_check_counts.MEDIUM }}</li>
+          <li>Enter graphic contents {{ graphic_check_counts.CONTENT }}</li>
+          <li>Enter print color {{ graphic_check_counts.PRINT_COLOR }}</li>
+          <li>Enter artists {{ graphic_check_counts.ARTISTS }}</li>
+          <li>Draw box without text {{ graphic_check_counts.BOX }}</li>
         </ul>
       </ul>
     </div>
     <div>
       <h2>OCR corrections</h2>
       <ul>
-        <li>enter other languages: {{ check_counts.OTHER_LANGUAGES|default:0 }}</li>
+        <li>enter other languages: {{ check_counts.OTHER_LANGUAGES }}</li>
         <li>delete empty boxes</li>
         <li>Mark words incorrect</li>
         <ul>

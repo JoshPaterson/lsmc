@@ -6,13 +6,15 @@
     <title>{{ page_title }}</title>
   </head>
   <body>
+    <a href="/">Home</a>
     <h1>{{ heading }}</h1>
     <img src="{{ image_url }}" alt="" style="height:1000px">
     <form action="{{ post_url }}", method="post">
       {% csrf_token %}
-        <label for="text">{{ label }}</label>
-        <input type="text" id="text" name="text" value="{{ previous_value }}">
+        <label for="input">{{ label }}</label>
+        <input type="{{ input_type }}" id="input" name="input" value="{{ previous_value }}">
         <input type="hidden" name="book_uuid" value="{{ book_uuid }}">
+        <input type="hidden" name="page_number" value="{{ page_number }}">
       <input type="submit" value="Submit">
     </form>
   </body>
