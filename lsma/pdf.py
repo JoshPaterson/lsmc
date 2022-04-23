@@ -21,6 +21,7 @@ PdfMetadata.REVERSE_NS[uri] = prefix
 
 
 def add_metadata(pdf_path: str, url: str, uuid: UUID) -> None:
+    print(f'adding metadata for {pdf_path}')
     with Pdf.open(pdf_path, allow_overwriting_input=True) as pdf:
         with pdf.open_metadata() as meta:
             meta['lsma:UUID'] = str(uuid)
@@ -33,10 +34,13 @@ def add_metadata(pdf_path: str, url: str, uuid: UUID) -> None:
 def get_metadata(pdf_path: str) -> UUID:
     with Pdf.open(pdf_path) as pdf:
         with pdf.open_metadata() as meta:
-            uuid_str = meta['lsma:UUID']
-            uuid = UUID(hex=uuid_str)
-            url = meta['lsma:URL']
-            downloaded_at = datetime.fromisoformat(meta['lsma:Downloaded_at'])
+            uuid = meta.get('lsma:UUID')
+            url = meta.get('lsma:URL')
+            downloaded_at = meta.get('lsma:Downloaded_at')
+            if uuid:
+                uuid = UUID(hex=uuid)
+            if downloaded_at:
+                downloaded_at = datetime.fromisoformat(downloaded_at)
             return uuid, url, downloaded_at
 
 
@@ -45,6 +49,7 @@ def extract_images(pdf_path, original_folder):
     if not original_folder.exists():
         original_folder.mkdir()
     for i, page in enumerate(pdf.pages, start=1):
+        print(f'extracting image from page {i} of {len(pdf.pages)} in {pdf_path}')
         xobject = page['/Resources']['/XObject']
         images = []
         for image in xobject.items():
@@ -55,6 +60,7 @@ def extract_images(pdf_path, original_folder):
         images.sort(key=lambda x: x.height)
         page_image = images[-1]
         if i==1 and page_image.height == 750 and page_image.width == 1800:
+            print(f'skipping google first page for {pdf_path}')
             continue
         filename = images[-1].extract_to(fileprefix=f'{original_folder}/{i}')
     pdf.close()
@@ -65,11 +71,13 @@ def convert_images(folder: Path):
         jp2_folder = folder / 'jp2'
         jp2_folder.mkdir(exist_ok=True)
     for image in jpg2000_images:
+        print(f'converting {image} to .png')
         moved_image = image.rename(jp2_folder/image.name)
         im = Image.open(moved_image)
         im.save(moved_image.parents[1]/f'{moved_image.stem}.png')
 
 def get_boxes(image_path: str) -> list[list]:
+    print(f'recognizing text in {image_path}')
     data = pytesseract.image_to_data(Image.open(image_path))
     data = data.split('\n')
     if data[-1] == '':
@@ -81,6 +89,7 @@ def get_stem(path):
     return int(path.stem)
 
 def add_book(pdf_path):
+    print(f'Adding {pdf_path}')
     uuid, url, downloaded_at = get_metadata(pdf_path)
     try:
         book = Book.objects.create(uuid=uuid, url=url, downloaded_at=downloaded_at)
@@ -95,8 +104,8 @@ def add_book(pdf_path):
     original_images = sorted(original_image_dir.glob('*.*'), key=get_stem)
 
     for original_image in original_images:
+        print(f'adding {original_image} to db')
         page = Page.objects.create(book=book, original_image=str(original_image), number=int(original_image.stem))
-        print('added ', page)
         box_lists = get_boxes(original_image)
         for i, box_list in enumerate(box_lists, start=1):
             box_list.append(i)

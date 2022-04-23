@@ -31,8 +31,14 @@ class EditTitlePageView(TemplateView):
         book = Book.objects.filter(title_page__isnull=True).first()
         if book == None:
             return redirect('/')
-        pages = book.pages.all()[:20]
-        return render(request, f'lsma/edit/title-page.html', {'book': book, 'pages': pages})
+        context = {
+            'book': book,
+            'pages': book.pages.all()[:20],
+            'heading': 'Choose Title Page',
+            'post_url': '/edit/title-page',
+            'page_title': 'Title Page',
+        }
+        return render(request, f'lsma/edit/choose-1-page.html', context=context)
 
     def post(self, request, *args, **kwargs):
         book = Book.objects.get(uuid=request.POST['book_uuid'])
@@ -50,8 +56,14 @@ class EditCopyrightPageView(TemplateView):
         book = Book.objects.filter(copyright_page__isnull=True).first()
         if book == None:
             return redirect('/')
-        pages = book.pages.all()[:20]
-        return render(request, f'lsma/edit/copyright-page.html', {'book': book, 'pages': pages})
+        context = {
+            'book': book,
+            'pages': book.pages.all()[:20],
+            'heading': 'Choose Copyright Page',
+            'post_url': '/edit/copyright-page',
+            'page_title': 'Copyright Page',
+        }
+        return render(request, f'lsma/edit/choose-1-page.html', context=context)
 
     def post(self, request, *args, **kwargs):
         book = Book.objects.get(uuid=request.POST['book_uuid'])
@@ -59,7 +71,12 @@ class EditCopyrightPageView(TemplateView):
         page = book.pages.get(number=request.POST['page_number'])
         book.copyright_page = page
         book.save()
-        BookCheck.objects.create(book=book, user=request.user, kind=BookCheck.Kind.COPYRIGHT_PAGE, old_value=old_value, new_value=request.POST['page_number'])
+        BookCheck.objects.create(
+            book=book,
+            user=request.user,
+            kind=BookCheck.Kind.COPYRIGHT_PAGE,
+            old_value=old_value,
+            new_value=request.POST['page_number'])
         return redirect('/edit/copyright-page')
 
 
@@ -69,14 +86,29 @@ class EditTitleView(TemplateView):
         if book == None:
             return redirect('/')
         title_page = book.title_page
-        return render(request, f'lsma/edit/title.html', {'book': book})
+        context = {
+            'page_title': 'Title',
+            'heading': 'Enter Title',
+            'image_url': book.title_page.jpg_image.url,
+            'post_url': '/edit/title',
+            'label': 'Title',
+            'book_uuid': book.uuid,
+            'previous_value': book.title,
+        }
+        return render(request, f'lsma/edit/single-text.html', context=context)
 
     def post(self, request, *args, **kwargs):
         book = Book.objects.get(uuid=request.POST['book_uuid'])
         old_value = book.title
-        book.title = request.POST['title']
+        book.title = request.POST['text']
         book.save()
-        BookCheck.objects.create(book=book, user=request.user, kind=BookCheck.Kind.TITLE, old_value=old_value, new_value=request.POST['title'])
+        BookCheck.objects.create(
+            book=book,
+            user=request.user,
+            kind=BookCheck.Kind.TITLE,
+            old_value=old_value,
+            new_value=request.POST['text']
+        )
         return redirect('/edit/title')
 
 
@@ -85,12 +117,27 @@ class EditSubtitleView(TemplateView):
         book = Book.objects.exclude(checks__kind=BookCheck.Kind.SUBTITLE).filter(title_page__isnull=False).first()
         if book == None:
             return redirect('/')
-        return render(request, f'lsma/edit/subtitle.html', {'book': book})
+        context = {
+            'page_title': 'Subtitle',
+            'heading': 'Enter Subtitle',
+            'image_url': book.title_page.jpg_image.url,
+            'post_url': '/edit/subtitle',
+            'label': 'Subtitle',
+            'book_uuid': book.uuid,
+            'previous_value': book.subtitle,
+        }
+        return render(request, f'lsma/edit/single-text.html', context=context)
 
     def post(self, request, *args, **kwargs):
         book = Book.objects.get(uuid=request.POST['book_uuid'])
         old_value = book.subtitle
-        book.subtitle = request.POST['subtitle']
+        book.subtitle = request.POST['text']
         book.save()
-        BookCheck.objects.create(book=book, user=request.user, kind=BookCheck.Kind.SUBTITLE, old_value=old_value, new_value=request.POST['subtitle'])
+        BookCheck.objects.create(
+            book=book,
+            user=request.user,
+            kind=BookCheck.Kind.SUBTITLE,
+            old_value=old_value,
+            new_value=request.POST['text']
+        )
         return redirect('/edit/subtitle')

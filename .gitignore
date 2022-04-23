@@ -2,6 +2,7 @@ CACHE/
 pdfs/
 static/
 original_page_images/
+new_pdf_downloads/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
